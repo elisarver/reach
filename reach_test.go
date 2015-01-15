@@ -1,4 +1,4 @@
-package reach
+package main
 
 import (
 	"fmt"
