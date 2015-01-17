@@ -10,12 +10,13 @@ import (
 )
 
 var (
-	conf Reacher
+	pTag   string
+	pLocal bool
 )
 
 const (
 	examples = `
-EXAMPLES:
+Examples:
 
   Get all img src from a web page:
 
@@ -29,6 +30,7 @@ EXAMPLES:
   http://example.com/about
 
 `
+	errorHeader = "\nERROR:\n\n  "
 )
 
 func init() {
@@ -41,66 +43,67 @@ func init() {
 
 	flag.Usage = func() {
 		cmd := filepath.Base(os.Args[0])
+		fmt.Fprintf(os.Stderr, "Reach is a tool to gather urls from a website.\n\n")
 		fmt.Fprintf(os.Stderr,
-			"%s: usage: %s [-l | -local] [-t=\"a\" | -tag=\"img\"] URLs...\n", cmd, cmd)
+			"Usage:\n\n  %s [-l | -local] [-t=\"a\" | -tag=\"img\"] URLs...\n", cmd)
 		fmt.Fprintf(os.Stderr, examples)
 	}
-
-	var pTag string
-	var pLocal bool
 
 	flag.StringVar(&pTag, "tag", defaultTag, tagUsage)
 	flag.StringVar(&pTag, "t", defaultTag, tagUsage+" (Shorthand)")
 	flag.BoolVar(&pLocal, "local", defaultLocal, localUsage)
 	flag.BoolVar(&pLocal, "l", defaultLocal, localUsage+" (Shorthand)")
-	flag.Parse()
-
-	conf = Reacher{
-		Local: pLocal,
-		Tag:   pTag,
-	}
 }
 
 func main() {
-	numArgs := chkArgs(flag.Args())
+	flag.Parse()
+
+	numArgs, err := chkArgs(flag.Args())
+	trap(err)
+
 	var output = make([]string, 0, numArgs)
-	for _, a := range flag.Args() {
-		c := conf // defensive copy; done several times.
-		var err error
-		if c.BaseURL, err = chkURL(a); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-			os.Exit(1)
+	var rr Reacher
+	for _, arg := range flag.Args() {
+		rr = Reacher{
+			Local: pLocal,
+			Tag:   pTag,
 		}
 
-		URLs, err := c.Reach()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
-			os.Exit(1)
-		}
-		cleaned := dropEmpties(URLs)
-		output = append(output, strings.Join(cleaned, "\n"))
+		var err error
+
+		// checked in chkArgs, ignoring error
+		rr.BaseURL, _ = url.ParseRequestURI(arg)
+
+		URLs, err := rr.Reach()
+		trap(err)
+
+		output = append(output, strings.Join(dropEmpties(URLs), "\n"))
 	}
 	fmt.Print(strings.Join(output, "\n"))
 	fmt.Println()
 }
 
-func chkArgs(args []string) int {
+func chkArgs(args []string) (int, error) {
 	numArgs := len(args)
 	if numArgs == 0 {
-		flag.Usage()
-		fmt.Fprint(os.Stderr, "\nERROR:\n\n  Please supply at least one URL.\n\n")
-		os.Exit(1)
+		return 0, fmt.Errorf("Please supply at least one URL.")
 	}
-	return numArgs
+	for _, a := range args {
+		_, err := chkURL(a)
+		if err != nil {
+			return 0, err
+		}
+	}
+	return numArgs, nil
 }
 
 func chkURL(u string) (*url.URL, error) {
-	url, err := url.ParseRequestURI(u)
+	var result *url.URL
+	result, err := url.ParseRequestURI(u)
 	if err != nil {
-		err = fmt.Errorf("URL '%s': is mal-formed, stopping.\n", u)
-		return nil, err
+		return nil, fmt.Errorf("URL %q is mal-formed %q.", u, err)
 	}
-	return url, nil
+	return result, nil
 }
 
 func dropEmpties(list []string) []string {
@@ -111,4 +114,12 @@ func dropEmpties(list []string) []string {
 		}
 	}
 	return newList
+}
+
+func trap(err error) {
+	if err != nil {
+		flag.Usage()
+		fmt.Fprint(os.Stderr, fmt.Errorf(errorHeader+err.Error()+"\n\n"))
+		os.Exit(1)
+	}
 }

@@ -6,6 +6,33 @@ import (
 	"testing"
 )
 
+func TestChkArgs(t *testing.T) {
+	type pair struct {
+		val      int
+		hasError bool
+	}
+
+	var formatPair = func(p pair) string {
+		return fmt.Sprintf("{%d, %t}", p.val, p.hasError)
+	}
+
+	input := []string{"http://example.com", "http://blog.example.com/", "://malformed@/"}
+
+	expected := []pair{
+		pair{1, false},
+		pair{2, false},
+		pair{0, true},
+	}
+
+	for i := range input {
+		a, b := chkArgs(input[0 : i+1])
+		actual := pair{a, b != nil}
+		if expected[i] != actual {
+			t.Errorf("chkArgs failed, had: %q, expected: %q", formatPair(actual), formatPair(expected[i]))
+		}
+	}
+}
+
 func TestDropEmpties(t *testing.T) {
 	input := []string{"not empty", "", "also not empty"}
 	expected := fmt.Sprintf("%q", []string{"not empty", "also not empty"})
