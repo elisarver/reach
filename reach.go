@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -12,18 +13,51 @@ var (
 	conf Reacher
 )
 
+const (
+	examples = `
+EXAMPLES:
+
+  Get all img src from a web page:
+
+  > reach -l -t img http://blog.golang.org
+  http://blog.golang.org/gophergala/fancygopher.jpg
+
+  Get all unique local links on a page:
+
+  > reach -l http://example.com/ | sort | uniq
+  http://example.com/blog
+  http://example.com/about
+
+`
+)
+
 func init() {
-	var pElement string
+	const (
+		defaultTag   = "a"
+		tagUsage     = "Tag to search for."
+		defaultLocal = false
+		localUsage   = "Only display local links."
+	)
+
+	flag.Usage = func() {
+		cmd := filepath.Base(os.Args[0])
+		fmt.Fprintf(os.Stderr,
+			"%s: usage: %s [-l | -local] [-t=\"a\" | -tag=\"img\"] URLs...\n", cmd, cmd)
+		fmt.Fprintf(os.Stderr, examples)
+	}
+
+	var pTag string
 	var pLocal bool
-	flag.StringVar(&pElement, "t", "a", "Tag to search for.")
-	flag.StringVar(&pElement, "tag", "a", "Tag to search for. (long)")
-	flag.BoolVar(&pLocal, "l", false, "Only display local links.")
-	flag.BoolVar(&pLocal, "local", false, "Only display local links (long)")
+
+	flag.StringVar(&pTag, "tag", defaultTag, tagUsage)
+	flag.StringVar(&pTag, "t", defaultTag, tagUsage+" (Shorthand)")
+	flag.BoolVar(&pLocal, "local", defaultLocal, localUsage)
+	flag.BoolVar(&pLocal, "l", defaultLocal, localUsage+" (Shorthand)")
 	flag.Parse()
 
 	conf = Reacher{
-		Local:   pLocal,
-		Element: pElement,
+		Local: pLocal,
+		Tag:   pTag,
 	}
 }
 
@@ -53,7 +87,8 @@ func main() {
 func chkArgs(args []string) int {
 	numArgs := len(args)
 	if numArgs == 0 {
-		fmt.Fprintln(os.Stderr, "Please supply at least one URL.")
+		flag.Usage()
+		fmt.Fprint(os.Stderr, "\nERROR:\n\n  Please supply at least one URL.\n\n")
 		os.Exit(1)
 	}
 	return numArgs

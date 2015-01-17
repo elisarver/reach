@@ -18,23 +18,23 @@ var (
 	bu, _   = url.Parse("http://example.com/")
 	testSet = [...]beforeAfter{
 		beforeAfter{
-			Reacher{Element: "a", Local: false, BaseURL: bu},
-			Reacher{Element: "a", Attribute: "href", Selector: "a[href]"},
+			Reacher{Tag: "a", Local: false, BaseURL: bu},
+			Reacher{Tag: "a", Attribute: "href", Selector: "a[href]"},
 			[]string{"http://example.com/a"},
 		},
 		beforeAfter{
-			Reacher{Element: "img", Local: false, BaseURL: bu},
-			Reacher{Element: "img", Attribute: "src", Selector: "img[src]"},
+			Reacher{Tag: "img", Local: false, BaseURL: bu},
+			Reacher{Tag: "img", Attribute: "src", Selector: "img[src]"},
 			[]string{"http://example.com/img"},
 		},
 		beforeAfter{
-			Reacher{Element: "foo", Local: false, BaseURL: bu},
-			Reacher{Element: "foo", Attribute: "src", Selector: "foo[src]"},
+			Reacher{Tag: "foo", Local: false, BaseURL: bu},
+			Reacher{Tag: "foo", Attribute: "src", Selector: "foo[src]"},
 			[]string{"http://somewhereelse.com/bar"},
 		},
 		beforeAfter{
-			Reacher{Element: "foo", Local: true, BaseURL: bu},
-			Reacher{Element: "foo", Attribute: "src", Selector: "foo[src]"},
+			Reacher{Tag: "foo", Local: true, BaseURL: bu},
+			Reacher{Tag: "foo", Attribute: "src", Selector: "foo[src]"},
 			[]string{""},
 		},
 	}

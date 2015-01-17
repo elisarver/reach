@@ -9,7 +9,7 @@ import (
 )
 
 type Reacher struct {
-	Element,
+	Tag,
 	Selector,
 	Attribute string
 	BaseURL *url.URL
@@ -48,7 +48,7 @@ func (r *Reacher) genAll() {
 }
 
 func (r *Reacher) genAttribute() {
-	switch r.Element {
+	switch r.Tag {
 	case "a", "link":
 		r.Attribute = "href"
 	default:
@@ -60,7 +60,7 @@ func (r *Reacher) genSelector() {
 	if r.Attribute == "" {
 		r.genAttribute()
 	}
-	r.Selector = fmt.Sprintf("%s[%s]", r.Element, r.Attribute)
+	r.Selector = fmt.Sprintf("%s[%s]", r.Tag, r.Attribute)
 }
 
 func (r *Reacher) genMapper() {
