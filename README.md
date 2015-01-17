@@ -1,10 +1,26 @@
-REACH OUT AND TOUCH SOME SERVER
+Reach is a tool to gather urls from a website.
 
-Reach queries a web page and gets the full set of resolved links.
+Usage:
 
-```
-Usage of ./reach:
-  -l: get only local links
-  -t: tag (e.g. img) to search for
-  [urls...]: one or more URLs.
-```
+  reach [-l | -local] [-t="a" | -tag="img"] URLs...
+
+Examples:
+
+  Get all img src from a web page:
+
+````
+  > reach -l -t img http://blog.golang.org
+  http://blog.golang.org/gophergala/fancygopher.jpg
+````
+
+  Get all unique local links on a page:
+
+````
+  > reach -l http://example.com/ | sort | uniq
+  http://example.com/blog
+  http://example.com/about
+````
+
+Installing: go get github.com/elisarver/reach
+
+Contact: eli@elisarver.com
