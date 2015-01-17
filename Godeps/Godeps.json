@@ -14,7 +14,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/net/html",
-			"Rev": "cbcac7bb8415db9b6cb4d1ebab1dc9afbd688b97"
+			"Rev": "ca657d0bd9d9b4f73523118b59af79e5374b9908"
 		}
 	]
 }
