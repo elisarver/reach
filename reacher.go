@@ -2,85 +2,84 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-type Reacher struct {
-	Tag,
-	Selector,
-	Attribute string
-	BaseURL *url.URL
-	Local   bool
-	mapper  func(int, *goquery.Selection) string
+type Tag struct {
+	Name,
+	Attribute,
+	CSSSelector string
 }
 
-func (r *Reacher) fromDocument(doc *goquery.Document) []string {
-	return doc.Find(r.Selector).Map(r.mapper)
-}
+// Create a new tag with the
+// appropriate attributes built-in.
+func NewTag(name string) Tag {
+	t := Tag{name, "", ""}
 
-func (r *Reacher) Reach() ([]string, error) {
-	if r.BaseURL == nil {
-		return nil, fmt.Errorf("BaseURL was not set")
-	}
-	r.genAll()
-
-	resp, err := http.Get(r.BaseURL.String())
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	doc, err := goquery.NewDocumentFromResponse(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.fromDocument(doc), nil
-}
-
-func (r *Reacher) genAll() {
-	r.genAttribute()
-	r.genSelector()
-	r.genMapper()
-}
-
-func (r *Reacher) genAttribute() {
-	switch r.Tag {
-	case "a", "link":
-		r.Attribute = "href"
+	switch t.Name {
 	default:
-		r.Attribute = "src"
+		t.Attribute = "src"
+	case "a", "link":
+		t.Attribute = "href"
+	}
+	t.CSSSelector = fmt.Sprintf("%s[%s]", t.Name, t.Attribute)
+	return t
+}
+
+// Finder provides a statement
+// goquery can use in a Find call.
+type Finder interface {
+	Find() string
+}
+
+// Tags use CSS selectors for now.
+func (t Tag) Find() string {
+	return t.CSSSelector
+}
+
+// Mapper generates an approprirate goquery map
+// function to retrieve a tag's attribute.
+type Mapper interface {
+	Map() func(int, *goquery.Selection) string
+}
+
+// Map provides the selection function for a goquery.Map.
+func (t Tag) Map() func(int, *goquery.Selection) string {
+	return func(_ int, sel *goquery.Selection) string {
+		s, _ := sel.Attr(t.Attribute)
+		return s
 	}
 }
 
-func (r *Reacher) genSelector() {
-	if r.Attribute == "" {
-		r.genAttribute()
-	}
-	r.Selector = fmt.Sprintf("%s[%s]", r.Tag, r.Attribute)
+type FinderMapper interface {
+	Finder
+	Mapper
 }
 
-func (r *Reacher) genMapper() {
-	r.mapper = func(_ int, sel *goquery.Selection) string {
-		s, ok := sel.Attr(r.Attribute)
-		if !ok {
-			return ""
-		}
+// Response is a goquery.Document
+// re-typed so we can modify it.
+type Response *goquery.Document
 
-		u, err := url.Parse(s)
-		if err != nil {
-			return ""
-		}
+// Apply finder and mapper to a Response.
+func FindMapInResponse(r Response, fm FinderMapper) []string {
+	return r.Find(fm.Find()).Map(fm.Map())
+}
 
-		u = r.BaseURL.ResolveReference(u)
+type Target struct {
+	*url.URL
+}
 
-		if r.Local && u.Host != r.BaseURL.Host {
-			return ""
-		}
-
-		return u.String()
+func NewTarget(s string) (Target, error) {
+	if u, err := url.ParseRequestURI(s); err == nil {
+		return Target{u}, nil
+	} else {
+		return Target{&url.URL{}}, err
 	}
+}
+
+// Reach function retrieves a goquery Document for a URL
+func Reach(t Target) (Response, error) {
+	return goquery.NewDocument(t.String())
 }

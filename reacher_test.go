@@ -1,87 +1,117 @@
 package main
 
 import (
-	"net/url"
 	"strings"
 	"testing"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-type beforeAfter struct {
-	subject,
-	expected Reacher
-	results []string
-}
+// tags are finders
+func TestNewTag(t *testing.T) {
 
-var (
-	bu, _   = url.Parse("http://example.com/")
-	testSet = [...]beforeAfter{
-		beforeAfter{
-			Reacher{Tag: "a", Local: false, BaseURL: bu},
-			Reacher{Tag: "a", Attribute: "href", Selector: "a[href]"},
-			[]string{"http://example.com/a"},
-		},
-		beforeAfter{
-			Reacher{Tag: "img", Local: false, BaseURL: bu},
-			Reacher{Tag: "img", Attribute: "src", Selector: "img[src]"},
-			[]string{"http://example.com/img"},
-		},
-		beforeAfter{
-			Reacher{Tag: "foo", Local: false, BaseURL: bu},
-			Reacher{Tag: "foo", Attribute: "src", Selector: "foo[src]"},
-			[]string{"http://somewhereelse.com/bar"},
-		},
-		beforeAfter{
-			Reacher{Tag: "foo", Local: true, BaseURL: bu},
-			Reacher{Tag: "foo", Attribute: "src", Selector: "foo[src]"},
-			[]string{""},
-		},
+	names := [4]string{
+		"a", "img", "link", "dontcare",
 	}
 
-	testHtml = "<a href='/a'/><img src='/img'/><foo src='http://somewhereelse.com/bar'/>"
-)
+	expecteds := [4]Tag{
+		Tag{"a", "href", "a[href]"},
+		Tag{"img", "src", "img[src]"},
+		Tag{"link", "href", "link[href]"},
+		Tag{"dontcare", "src", "dontcare[src]"},
+	}
 
-func TestGenAttribute(t *testing.T) {
-	for _, tt := range testSet {
-		tt.subject.genAttribute()
-		if tt.subject.Attribute != tt.expected.Attribute {
-			t.Errorf("Expected Reacher.Attribute to have value %q, but it had %q",
-				tt.expected.Attribute, tt.subject.Attribute)
+	for i := range names {
+		name := names[i]
+		act := NewTag(name)
+		exp := expecteds[i]
+
+		if act != exp {
+			t.Errorf("expected %q, got %q", exp, act)
 		}
 	}
 }
 
-func TestGenSelector(t *testing.T) {
-	for _, tt := range testSet {
-		tt.subject.genSelector()
-		if tt.subject.Selector != tt.expected.Selector {
-			t.Errorf("Expected Reacher.Selector to have value %q, but it had %q",
-				tt.expected.Selector, tt.subject.Selector)
-		}
+func TestTagFinder(t *testing.T) {
+	doc, _ := goquery.NewDocumentFromReader(
+		strings.NewReader("<a href='http://www.example.com/'/>"))
+	var f Finder = NewTag("a")
+
+	if f.(Tag).CSSSelector != f.Find() {
+		t.Errorf("Find() should return the CSS selector")
+	}
+
+	act := doc.Find(f.Find())
+	if act.Size() != 1 {
+		t.Errorf("expected only one a[href] match.")
 	}
 }
 
-func TestGenMapper(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(testHtml))
-	if err != nil {
-		t.Errorf("Error parsing testHtml %q; error:%q", testHtml, err)
-	}
-	for _, tt := range testSet {
-		tt.subject.genAll()
+func TestTagMapper(t *testing.T) {
+	doc, _ := goquery.NewDocumentFromReader(
+		strings.NewReader("<a href='http://www.example.com/'/><link href=''/><dontcare/>"))
 
-		if tt.subject.mapper == nil {
-			t.Error("Expected Reacher.Mapper to contain an anonymous function.")
-		} else {
-			results := tt.subject.fromDocument(doc)
-			if len(results) != len(tt.results) {
-				t.Errorf("Got different results in expected than actual;\nactual: %q\nexpected%q\n", results, tt.results)
-			}
-			for i := range tt.results {
-				if results[i] != tt.results[i] {
-					t.Errorf("Result %d for selector %s: Expected %q, got %q", i, tt.expected.Selector, tt.results[0], results[0])
-				}
-			}
-		}
+	var m Mapper = NewTag("a")
+
+	act := doc.Find("a").Map(m.Map())
+	if act[0] != "http://www.example.com/" {
+		t.Errorf("Map should have resulted in extracting the url.")
+	}
+
+	// negative
+	act = doc.Find("img").Map(m.Map())
+	if len(act) != 0 {
+		t.Errorf("Map should have 0 entries.")
+	}
+
+	m = NewTag("dontcare")
+	act = doc.Find("dontcare").Map(m.Map())
+	if len(act) != 1 {
+		t.Errorf("Map should have 1 entry")
+	}
+	if act[0] != "" {
+		t.Errorf("first value should be empty")
+	}
+}
+
+func TestFindMapInResponse(t *testing.T) {
+	var res Response
+	res, _ = goquery.NewDocumentFromReader(
+		strings.NewReader("<a href='http://www.example.com/'/><link href=''/><dontcare/>"))
+
+	var fm FinderMapper = NewTag("a")
+	exp := []string{"http://www.example.com/"}
+	act := FindMapInResponse(res, fm)
+
+	if len(act) != 1 {
+		t.Errorf("Map should have 1 entry")
+	}
+
+	if act[0] != exp[0] {
+		t.Errorf("expected %q, got %q", exp[0], act[0])
+	}
+}
+
+func TestTarget(t *testing.T) {
+	var in string
+	var err error
+
+	in = ">|O.^.o|<"
+	if _, err = NewTarget(in); err == nil {
+		t.Error("expected an error.")
+	}
+
+	// breaks compile on bad type change.
+	var act Target
+
+	in = "http://www.example.com/"
+	if act, err = NewTarget(in); err != nil {
+		t.Error(err)
+	}
+
+	if act.String() != in {
+		t.Errorf(
+			"expected targ.String %q to match input %q.",
+			act.String(), in)
 	}
 }

@@ -6,29 +6,73 @@ import (
 	"testing"
 )
 
-func TestChkArgs(t *testing.T) {
+func TestArgTargets(t *testing.T) {
 	type pair struct {
-		val      int
-		hasError bool
+		targets []Target
+		err     error
 	}
 
-	var formatPair = func(p pair) string {
-		return fmt.Sprintf("{%d, %t}", p.val, p.hasError)
+	ustr := []string{
+		"http://example.com",
+		"http://blog.example.com/",
+		"://malformed@/",
 	}
 
-	input := []string{"http://example.com", "http://blog.example.com/", "://malformed@/"}
+	l := len(ustr)
 
-	expected := []pair{
-		pair{1, false},
-		pair{2, false},
-		pair{0, true},
+	urls := make([]*url.URL, l)
+	errs := make([]error, l)
+
+	for i := 0; i < l; i++ {
+		urls[i], errs[i] = url.ParseRequestURI(ustr[i])
 	}
 
-	for i := range input {
-		a, b := chkArgs(input[0 : i+1])
-		actual := pair{a, b != nil}
-		if expected[i] != actual {
-			t.Errorf("chkArgs failed, had: %q, expected: %q", formatPair(actual), formatPair(expected[i]))
+	argss := [][]string{
+		[]string{},
+		[]string{ustr[0]},
+		[]string{ustr[0], ustr[1]},
+		[]string{ustr[2]},
+	}
+
+	expecteds := []pair{
+		pair{[]Target{}, fmt.Errorf("Please supply at least one URL.")},
+		pair{[]Target{Target{urls[0]}}, nil},
+		pair{[]Target{Target{urls[0]}, Target{urls[1]}}, nil},
+		pair{[]Target{}, errs[2]},
+	}
+
+	for i := range argss {
+		a, e := argTargets(argss[i])
+		act := pair{a, e}
+		exp := expecteds[i]
+
+		shouldError := exp.err != nil
+		didError := act.err != nil
+
+		if shouldError != didError {
+			if shouldError {
+				t.Errorf("expected error %q ", exp.err)
+			} else {
+				t.Errorf("did not expect error %q", act.err)
+			}
+		}
+
+		if shouldError && didError {
+			if act.err.Error() != exp.err.Error() {
+				t.Errorf("expected error %q, got %q", exp.err, act.err)
+			}
+		}
+
+		if len(exp.targets) != len(act.targets) {
+			t.Errorf("size of exp and act targets mismatch on:\n\texp: %q\n\tact: %q", exp, act)
+		}
+		for j := range exp.targets {
+			expVal := exp.targets[j].String()
+			actVal := act.targets[j].String()
+			if expVal != actVal {
+				t.Errorf("expected actual value %q to equal expected value %q",
+					act.targets[j], exp.targets[j])
+			}
 		}
 	}
 }
@@ -40,41 +84,5 @@ func TestDropEmpties(t *testing.T) {
 	if expected != actual {
 		t.Errorf("dropEmpties failed!\nExpected:\n\t%s\nGot:\n\t%s\n",
 			expected, actual)
-	}
-}
-
-func TestChkURL(t *testing.T) {
-	input := []string{"http://www.google.com/", ""}
-
-	type pair struct {
-		shouldError bool
-		url         *url.URL
-	}
-
-	expected := []pair{
-		pair{false, &url.URL{Scheme: "http", Host: "www.google.com", Path: "/"}},
-		pair{true, nil},
-	}
-
-	for i := range input {
-		inp := input[i]
-		exp := expected[i]
-		act, acte := chkURL(inp)
-
-		if exp.shouldError {
-			if acte == nil {
-				t.Error("expected error to not be nil.")
-			}
-			if act != nil {
-				t.Errorf("expected url to be nil, was %q", act)
-			}
-		} else {
-			if acte != nil {
-				t.Errorf("expected error to be nil, was %q", acte)
-			}
-			if act == nil {
-				t.Error("expected url to have value, did not")
-			}
-		}
 	}
 }

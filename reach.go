@@ -3,15 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
 var (
-	pTag   string
-	pLocal bool
+	pTag string
 )
 
 const (
@@ -20,12 +18,12 @@ Examples:
 
   Get all img src from a web page:
 
-  > reach -l -t img http://blog.golang.org
+  > reach -t img http://blog.golang.org
   http://blog.golang.org/gophergala/fancygopher.jpg
 
-  Get all unique local links on a page:
+  Get all unique links on a page:
 
-  > reach -l http://example.com/ | sort | uniq
+  > reach http://example.com/ | sort | uniq
   http://example.com/blog
   http://example.com/about
 
@@ -35,77 +33,68 @@ Examples:
 
 func init() {
 	const (
-		defaultTag   = "a"
-		tagUsage     = "Tag to search for."
-		defaultLocal = false
-		localUsage   = "Only display local links."
+		defaultTag = "a"
+		tagUsage   = "Tag to search for."
 	)
 
 	flag.Usage = func() {
 		cmd := filepath.Base(os.Args[0])
 		fmt.Fprintf(os.Stderr, "Reach is a tool to gather urls from a website.\n\n")
 		fmt.Fprintf(os.Stderr,
-			"Usage:\n\n  %s [-l | -local] [-t=\"a\" | -tag=\"img\"] URLs...\n", cmd)
+			"Usage:\n\n  %s [-t=\"a\" | -tag=\"img\"] URLs...\n", cmd)
 		fmt.Fprintf(os.Stderr, examples)
 	}
 
 	flag.StringVar(&pTag, "tag", defaultTag, tagUsage)
 	flag.StringVar(&pTag, "t", defaultTag, tagUsage+" (Shorthand)")
-	flag.BoolVar(&pLocal, "local", defaultLocal, localUsage)
-	flag.BoolVar(&pLocal, "l", defaultLocal, localUsage+" (Shorthand)")
 }
 
 func main() {
 	flag.Parse()
 
-	numArgs, err := chkArgs(flag.Args())
+	ts, err := argTargets(flag.Args())
 	trap(err)
 
-	var output = make([]string, 0, numArgs)
-	var rr Reacher
-	for _, arg := range flag.Args() {
-		rr = Reacher{
-			Local: pLocal,
-			Tag:   pTag,
-		}
+	var (
+		output = make([]string, len(ts))
+		tag    = NewTag(pTag)
+	)
 
-		var err error
-
-		// checked in chkArgs, ignoring error
-		rr.BaseURL, _ = url.ParseRequestURI(arg)
-
-		URLs, err := rr.Reach()
+	for i, t := range ts {
+		resp, err := Reach(t)
 		trap(err)
 
-		output = append(output, strings.Join(dropEmpties(URLs), "\n"))
+		URLs := FindMapInResponse(resp, tag)
+		output[i] = strings.Join(dropEmpties(URLs), "\n")
 	}
 	fmt.Print(strings.Join(output, "\n"))
 	fmt.Println()
 }
 
-func chkArgs(args []string) (int, error) {
+// argTargets filters the incoming argument array,
+// verifying that the parameters are able to provide
+// request URIs. Returns a list of targets or an error.
+// Always check error! In order to return a good default
+// type, we pass back a slice of Target. This is not a
+// pointer, so a nil check is unnecessary. A target is
+// an alias to strings verified by this function.
+func argTargets(args []string) ([]Target, error) {
 	numArgs := len(args)
 	if numArgs == 0 {
-		return 0, fmt.Errorf("Please supply at least one URL.")
+		return []Target{}, fmt.Errorf("Please supply at least one URL.")
 	}
-	for _, a := range args {
-		_, err := chkURL(a)
-		if err != nil {
-			return 0, err
+	ts := make([]Target, len(args))
+	for i, _ := range args {
+		if targ, err := NewTarget(args[i]); err != nil {
+			return []Target{}, err
+		} else {
+			ts[i] = targ
 		}
 	}
-	return numArgs, nil
+	return ts, nil
 }
 
-func chkURL(u string) (*url.URL, error) {
-	var result *url.URL
-	result, err := url.ParseRequestURI(u)
-	if err != nil {
-		return nil, fmt.Errorf("URL %q is mal-formed %q.", u, err)
-	}
-	return result, nil
-}
-
+// dropEmpties simply eliminates empty values from a list of strings.
 func dropEmpties(list []string) []string {
 	newList := make([]string, 0, len(list))
 	for i := range list {
