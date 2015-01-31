@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/url"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -65,21 +64,4 @@ type Response *goquery.Document
 // Apply finder and mapper to a Response.
 func FindMapInResponse(r Response, fm FinderMapper) []string {
 	return r.Find(fm.Find()).Map(fm.Map())
-}
-
-type Target struct {
-	*url.URL
-}
-
-func NewTarget(s string) (Target, error) {
-	if u, err := url.ParseRequestURI(s); err == nil {
-		return Target{u}, nil
-	} else {
-		return Target{&url.URL{}}, err
-	}
-}
-
-// Reach function retrieves a goquery Document for a URL
-func Reach(t Target) (Response, error) {
-	return goquery.NewDocument(t.String())
 }
