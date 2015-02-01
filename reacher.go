@@ -62,6 +62,6 @@ type FinderMapper interface {
 type Response *goquery.Document
 
 // Apply finder and mapper to a Response.
-func FindMapInResponse(r Response, fm FinderMapper) []string {
+func FindMap(r Response, fm FinderMapper) []string {
 	return r.Find(fm.Find()).Map(fm.Map())
 }

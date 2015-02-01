@@ -64,7 +64,7 @@ func main() {
 		resp, err := Reach(t)
 		trap(err)
 
-		URLs := FindMapInResponse(resp, tag)
+		URLs := FindMap(resp, tag)
 		output[i] = strings.Join(dropEmpties(URLs), "\n")
 	}
 	fmt.Print(strings.Join(output, "\n"))

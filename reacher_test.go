@@ -74,14 +74,14 @@ func TestTagMapper(t *testing.T) {
 	}
 }
 
-func TestFindMapInResponse(t *testing.T) {
+func TestFindMap(t *testing.T) {
 	var res Response
 	res, _ = goquery.NewDocumentFromReader(
 		strings.NewReader("<a href='http://www.example.com/'/><link href=''/><dontcare/>"))
 
 	var fm FinderMapper = NewTag("a")
 	exp := []string{"http://www.example.com/"}
-	act := FindMapInResponse(res, fm)
+	act := FindMap(res, fm)
 
 	if len(act) != 1 {
 		t.Errorf("Map should have 1 entry")
