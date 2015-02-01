@@ -83,12 +83,12 @@ func argTargets(args []string) ([]Target, error) {
 	if numArgs == 0 {
 		return []Target{}, fmt.Errorf("Please supply at least one URL.")
 	}
-	ts := make([]Target, len(args))
+	ts := make([]Target, 0, len(args))
 	for i, _ := range args {
 		if targ, err := NewTarget(args[i]); err != nil {
 			return []Target{}, err
 		} else {
-			ts[i] = targ
+			ts = append(ts, targ)
 		}
 	}
 	return ts, nil
