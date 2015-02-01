@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -65,6 +66,7 @@ func main() {
 		trap(err)
 
 		URLs := FindMap(resp, tag)
+
 		output[i] = strings.Join(dropEmpties(URLs), "\n")
 	}
 	fmt.Print(strings.Join(output, "\n"))
@@ -83,9 +85,14 @@ func argTargets(args []string) ([]Target, error) {
 	if numArgs == 0 {
 		return []Target{}, fmt.Errorf("Please supply at least one URL.")
 	}
+	t := Target{&url.URL{}}
+	return t.ParseAll(args)
+}
+
+func (t Target) ParseAll(args []string) ([]Target, error) {
 	ts := make([]Target, 0, len(args))
 	for i, _ := range args {
-		if targ, err := NewTarget(args[i]); err != nil {
+		if targ, err := t.Parse(args[i]); err != nil {
 			return []Target{}, err
 		} else {
 			ts = append(ts, targ)
