@@ -6,16 +6,20 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// A Target is a validated url for the purposes of a HTTP dial.
 type Target struct {
 	*url.URL
 }
 
-func NewTarget(s string) (Target, error) {
-	if u, err := url.ParseRequestURI(s); err == nil {
-		return Target{u}, nil
-	} else {
-		return Target{&url.URL{}}, err
-	}
+// NewTarget generates a Target IFF
+func NewTarget(rawurl string) (Target, error) {
+	var t Target = Target{&url.URL{}}
+	return t.Parse(rawurl)
+}
+
+func (t Target) Parse(rawurl string) (Target, error) {
+	u, err := t.URL.Parse(rawurl)
+	return Target{u}, err
 }
 
 // Reach function retrieves a goquery Document for a URL

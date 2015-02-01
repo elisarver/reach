@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"net/url"
 	"testing"
 )
 
+/*
 func TestArgTargets(t *testing.T) {
 	type pair struct {
 		targets []Target
@@ -76,6 +76,7 @@ func TestArgTargets(t *testing.T) {
 		}
 	}
 }
+*/
 
 func TestDropEmpties(t *testing.T) {
 	input := []string{"not empty", "", "also not empty"}

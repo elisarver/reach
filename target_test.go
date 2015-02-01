@@ -2,26 +2,40 @@ package main
 
 import "testing"
 
-func TestTarget(t *testing.T) {
-	var in string
-	var err error
-
-	in = ">|O.^.o|<"
-	if _, err = NewTarget(in); err == nil {
-		t.Error("expected an error.")
+func TestNewTarget_Empty(t *testing.T) {
+	target, err := NewTarget("")
+	if target.String() != "" {
+		t.Errorf("expected target.String() to be empty, is %q", target.String())
 	}
-
-	// breaks compile on bad type change.
-	var act Target
-
-	in = "http://www.example.com/"
-	if act, err = NewTarget(in); err != nil {
-		t.Error(err)
+	if err != nil {
+		t.Errorf("unexpected error: %q", err)
 	}
+}
 
-	if act.String() != in {
-		t.Errorf(
-			"expected targ.String %q to match input %q.",
-			act.String(), in)
+func TestNewTarget_NoHost(t *testing.T) {
+	in := "/"
+	target, err := NewTarget(in)
+	if target.IsAbs() {
+		t.Error("unexpected absolute target")
+	}
+	if target.String() != in {
+		t.Errorf("expected target.String() == %q, got %q", in, target.String())
+	}
+	if err != nil {
+		t.Errorf("unexpected error: %q", err)
+	}
+}
+
+func TestNewTarget_ProperURL(t *testing.T) {
+	in := "http://www.example.com/jobs/33"
+	target, err := NewTarget(in)
+	if target.String() == "" {
+		t.Error("expected target.URL.String() to not be empty")
+	}
+	if target.String() != in {
+		t.Error("expected target.String() == %q, got %q", in, target)
+	}
+	if err != nil {
+		t.Errorf("unexpected error: %q", err)
 	}
 }
