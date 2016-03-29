@@ -1,3 +1,4 @@
 reach
 *.sublime*
-.idea
+.idea/
+vendor/
