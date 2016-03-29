@@ -24,6 +24,6 @@ func (t Target) Parse(rawurl string) (Target, error) {
 }
 
 // Reach function retrieves a goquery Document for a URL
-func Reach(t Target) (Response, error) {
+func Reach(t Target) (*goquery.Document, error) {
 	return goquery.NewDocument(t.String())
 }

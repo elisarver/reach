@@ -75,7 +75,7 @@ func TestTagMapper(t *testing.T) {
 }
 
 func TestFindMap(t *testing.T) {
-	var res Response
+	var res *goquery.Document
 	res, _ = goquery.NewDocumentFromReader(
 		strings.NewReader("<a href='http://www.example.com/'/><link href=''/><dontcare/>"))
 
