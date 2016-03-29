@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// A Target is a validated url for the purposes of a HTTP dial.
+// Target represents a validated url.
 type Target struct {
 	*url.URL
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// tags are finders
+// tags represent finders
 func TestNewTag(t *testing.T) {
 
 	names := [4]string{

@@ -40,7 +40,7 @@ func init() {
 
 	flag.Usage = func() {
 		cmd := filepath.Base(os.Args[0])
-		fmt.Fprintf(os.Stderr, "Reach is a tool to gather urls from a website.\n\n")
+		fmt.Fprintf(os.Stderr, "Reach gathers urls from a website.\n\n")
 		fmt.Fprintf(os.Stderr,
 			"Usage:\n\n  %s [-t=\"a\" | -tag=\"img\"] URLs...\n", cmd)
 		fmt.Fprintf(os.Stderr, examples)
@@ -78,8 +78,8 @@ func main() {
 // request URIs. Returns a list of targets or an error.
 // Always check error! In order to return a good default
 // type, we pass back a slice of Target. This is not a
-// pointer, so a nil check is unnecessary. A target is
-// an alias to strings verified by this function.
+// pointer, so a nil check is unnecessary. Target aliases
+// to strings verified by this function.
 func argTargets(args []string) ([]Target, error) {
 	numArgs := len(args)
 	if numArgs == 0 {
@@ -89,6 +89,7 @@ func argTargets(args []string) ([]Target, error) {
 	return t.ParseAll(args)
 }
 
+// ParseAll converts arguments into a list of URLs.
 func (t Target) ParseAll(args []string) ([]Target, error) {
 	ts := make([]Target, 0, len(args))
 	for i, _ := range args {
@@ -101,7 +102,7 @@ func (t Target) ParseAll(args []string) ([]Target, error) {
 	return ts, nil
 }
 
-// dropEmpties simply eliminates empty values from a list of strings.
+// dropEmpties eliminates empty values from a list of strings.
 func dropEmpties(list []string) []string {
 	newList := make([]string, 0, len(list))
 	for i := range list {
