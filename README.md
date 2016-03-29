@@ -1,6 +1,10 @@
-Reach is a tool to gather urls from a website.
+Reach gathers urls from a website.
 
-Usage:
+Installation:
+
+I suggest you install [glide](https://github.com/Masterminds/glide), and run glide install.
+
+Usage: 
 
   reach [-t="a" | -tag="img"] URLs...
 
@@ -21,6 +25,4 @@ Examples:
   http://example.com/about
 ````
 
-Installing: go get github.com/elisarver/reach
-
-Contact: eli@elisarver.com
+Contact: eli.sarver@gmail.com
