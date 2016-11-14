@@ -13,7 +13,7 @@ type Target struct {
 
 // NewTarget makes a Target from a raw url string
 func NewTarget(rawurl string) (Target, error) {
-	var t Target = Target{&url.URL{}}
+	var t = Target{&url.URL{}}
 	return t.Parse(rawurl)
 }
 

@@ -6,14 +6,14 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// Tag represents an html tag
 type Tag struct {
 	Name,
 	Attribute,
 	CSSSelector string
 }
 
-// Create a new tag with the
-// appropriate attributes built-in.
+// NewTag creates a new tag with the appropriate attributes built-in.
 func NewTag(name string) Tag {
 	t := Tag{name, "", ""}
 
@@ -27,14 +27,13 @@ func NewTag(name string) Tag {
 	return t
 }
 
-// Finder provides a statement
-// goquery can use in a Find call.
+// Finder provides a statement goquery can use in a Find call.
 type Finder interface {
 	Find() string
 }
 
-// Tags use CSS selectors for now.
-func (t Tag) Find() string {
+// Selector returns a tag's CSS selector string.
+func (t Tag) Selector() string {
 	return t.CSSSelector
 }
 
@@ -52,12 +51,14 @@ func (t Tag) Map() func(int, *goquery.Selection) string {
 	}
 }
 
+// FinderMapper is the intersection of something that can find results and map them over functions.
 type FinderMapper interface {
 	Finder
 	Mapper
 }
 
-// Apply finder and mapper to a Response.
+// FindMap finds elements and maps them to response.
 func FindMap(r *goquery.Document, fm FinderMapper) []string {
 	return r.Find(fm.Find()).Map(fm.Map())
 }
+
