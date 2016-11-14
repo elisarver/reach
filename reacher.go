@@ -29,11 +29,11 @@ func NewTag(name string) Tag {
 
 // Selector provides a statement goquery can use in a Find call.
 type Selector interface {
-	Selector() string
+	Select() string
 }
 
-// Selector returns a tag's CSS selector string.
-func (t Tag) Selector() string {
+// Select returns a tag's CSS select string.
+func (t Tag) Select() string {
 	return t.CSSSelector
 }
 
@@ -59,5 +59,5 @@ type SelectorMapper interface {
 
 // SelectMap selects elements and maps them to response.
 func SelectMap(r *goquery.Document, fm SelectorMapper) []string {
-	return r.Find(fm.Selector()).Map(fm.Map())
+	return r.Find(fm.Select()).Map(fm.Map())
 }

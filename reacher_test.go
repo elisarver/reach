@@ -37,11 +37,11 @@ func TestTagFinder(t *testing.T) {
 		strings.NewReader("<a href='http://www.example.com/'/>"))
 	var f Selector = NewTag("a")
 
-	if f.(Tag).CSSSelector != f.Selector() {
+	if f.(Tag).CSSSelector != f.Select() {
 		t.Error("Find() should return the CSS selector")
 	}
 
-	act := doc.Find(f.Selector())
+	act := doc.Find(f.Select())
 	if act.Size() != 1 {
 		t.Error("expected only one a[href] match.")
 	}
