@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"net/url"
@@ -38,7 +39,7 @@ func TestArgTargets(t *testing.T) {
 	}
 
 	expecteds := []pair{
-		{[]Target{}, fmt.Errorf("Please supply at least one URL.")},
+		{[]Target{}, errors.New("Please supply at least one URL.")},
 		{[]Target{{urls[0]}}, nil},
 		{[]Target{{urls[0]}, {urls[1]}}, nil},
 		{[]Target{}, errs[2]},
