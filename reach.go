@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 var (
@@ -57,18 +59,20 @@ func main() {
 	ts, err := argTargets(flag.Args())
 	trap(err)
 
-	output := reachTargets(ts, pTag)
+	output := reachTargets(ts, pTag, Reach)
 	fmt.Print(strings.Join(output, "\n"))
 	fmt.Println()
 }
 
-func reachTargets(ts []Target, tagName string) []string {
+type rf func(Target) (*goquery.Document, error)
+
+func reachTargets(ts []Target, tagName string, reachFn rf) []string {
 	var (
 		output = make([]string, len(ts))
 		tag    = NewTag(tagName)
 	)
 	for i, t := range ts {
-		resp, err := Reach(t)
+		resp, err := reachFn(t)
 		trap(err)
 
 		URLs := SelectMap(resp, tag)

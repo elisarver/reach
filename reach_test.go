@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"net/url"
+	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -74,6 +77,21 @@ func TestArgTargets(t *testing.T) {
 					act.targets[j], exp.targets[j])
 			}
 		}
+	}
+}
+
+// reachTargets(ts []Target, tagName string, reachFn func(string) (*goquery.Document, error)) []string {
+func TestReachTargets(t *testing.T) {
+	reachFnSuccess := func(_ Target) (*goquery.Document, error) {
+		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a></body></html>")
+		return goquery.NewDocumentFromReader(r)
+	}
+	u, _ := NewTarget("http://foo.bar/")
+	us := []Target{u}
+	actual := reachTargets(us, "a", reachFnSuccess)
+	expected := []string{"http://foo.bar/"}
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("expected %v, got %v", expected, actual)
 	}
 }
 
