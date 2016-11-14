@@ -61,4 +61,3 @@ type FinderMapper interface {
 func FindMap(r *goquery.Document, fm FinderMapper) []string {
 	return r.Find(fm.Find()).Map(fm.Map())
 }
-

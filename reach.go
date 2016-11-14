@@ -36,7 +36,7 @@ Examples:
 func init() {
 	const (
 		defaultTag = "a"
-		tagUsage = "Tag to search for."
+		tagUsage   = "Tag to search for."
 	)
 
 	flag.Usage = func() {
@@ -48,7 +48,7 @@ func init() {
 	}
 
 	flag.StringVar(&pTag, "tag", defaultTag, tagUsage)
-	flag.StringVar(&pTag, "t", defaultTag, tagUsage + " (Shorthand)")
+	flag.StringVar(&pTag, "t", defaultTag, tagUsage+" (Shorthand)")
 }
 
 func main() {
@@ -59,7 +59,7 @@ func main() {
 
 	var (
 		output = make([]string, len(ts))
-		tag = NewTag(pTag)
+		tag    = NewTag(pTag)
 	)
 
 	for i, t := range ts {
