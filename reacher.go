@@ -27,9 +27,9 @@ func NewTag(name string) Tag {
 	return t
 }
 
-// Finder provides a statement goquery can use in a Find call.
-type Finder interface {
-	Find() string
+// Selector provides a statement goquery can use in a Find call.
+type Selector interface {
+	Selector() string
 }
 
 // Selector returns a tag's CSS selector string.
@@ -51,13 +51,13 @@ func (t Tag) Map() func(int, *goquery.Selection) string {
 	}
 }
 
-// FinderMapper is the intersection of something that can find results and map them over functions.
-type FinderMapper interface {
-	Finder
+// SelectorMapper is the intersection of something that can select results and map them over functions.
+type SelectorMapper interface {
+	Selector
 	Mapper
 }
 
-// FindMap finds elements and maps them to response.
-func FindMap(r *goquery.Document, fm FinderMapper) []string {
-	return r.Find(fm.Find()).Map(fm.Map())
+// SelectMap selects elements and maps them to response.
+func SelectMap(r *goquery.Document, fm SelectorMapper) []string {
+	return r.Find(fm.Selector()).Map(fm.Map())
 }

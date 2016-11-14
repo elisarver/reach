@@ -35,13 +35,13 @@ func TestNewTag(t *testing.T) {
 func TestTagFinder(t *testing.T) {
 	doc, _ := goquery.NewDocumentFromReader(
 		strings.NewReader("<a href='http://www.example.com/'/>"))
-	var f Finder = NewTag("a")
+	var f Selector = NewTag("a")
 
-	if f.(Tag).CSSSelector != f.Find() {
+	if f.(Tag).CSSSelector != f.Selector() {
 		t.Error("Find() should return the CSS selector")
 	}
 
-	act := doc.Find(f.Find())
+	act := doc.Find(f.Selector())
 	if act.Size() != 1 {
 		t.Error("expected only one a[href] match.")
 	}
@@ -74,14 +74,14 @@ func TestTagMapper(t *testing.T) {
 	}
 }
 
-func TestFindMap(t *testing.T) {
+func TestSelectMap(t *testing.T) {
 	var res *goquery.Document
 	res, _ = goquery.NewDocumentFromReader(
 		strings.NewReader("<a href='http://www.example.com/'/><link href=''/><dontcare/>"))
 
-	var fm FinderMapper = NewTag("a")
+	var fm SelectorMapper = NewTag("a")
 	exp := []string{"http://www.example.com/"}
-	act := FindMap(res, fm)
+	act := SelectMap(res, fm)
 
 	if len(act) != 1 {
 		t.Error("Map should have 1 entry")
