@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net/url"
 	"testing"
 )
 
-/*
 func TestArgTargets(t *testing.T) {
 	type pair struct {
 		targets []Target
@@ -28,17 +28,17 @@ func TestArgTargets(t *testing.T) {
 	}
 
 	argss := [][]string{
-		[]string{},
-		[]string{ustr[0]},
-		[]string{ustr[0], ustr[1]},
-		[]string{ustr[2]},
+		{},
+		{ustr[0]},
+		{ustr[0], ustr[1]},
+		{ustr[2]},
 	}
 
 	expecteds := []pair{
-		pair{[]Target{}, fmt.Errorf("Please supply at least one URL.")},
-		pair{[]Target{Target{urls[0]}}, nil},
-		pair{[]Target{Target{urls[0]}, Target{urls[1]}}, nil},
-		pair{[]Target{}, errs[2]},
+		{[]Target{}, fmt.Errorf("Please supply at least one URL.")},
+		{[]Target{{urls[0]}}, nil},
+		{[]Target{{urls[0]}, {urls[1]}}, nil},
+		{[]Target{}, errs[2]},
 	}
 
 	for i := range argss {
@@ -76,7 +76,6 @@ func TestArgTargets(t *testing.T) {
 		}
 	}
 }
-*/
 
 func TestDropEmpties(t *testing.T) {
 	input := []string{"not empty", "", "also not empty"}
