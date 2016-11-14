@@ -57,11 +57,16 @@ func main() {
 	ts, err := argTargets(flag.Args())
 	trap(err)
 
+	output := reachTargets(ts, pTag)
+	fmt.Print(strings.Join(output, "\n"))
+	fmt.Println()
+}
+
+func reachTargets(ts []Target, tagName string) []string {
 	var (
 		output = make([]string, len(ts))
-		tag    = NewTag(pTag)
+		tag    = NewTag(tagName)
 	)
-
 	for i, t := range ts {
 		resp, err := Reach(t)
 		trap(err)
@@ -70,8 +75,7 @@ func main() {
 
 		output[i] = strings.Join(dropEmpties(URLs), "\n")
 	}
-	fmt.Print(strings.Join(output, "\n"))
-	fmt.Println()
+	return output
 }
 
 // argTargets filters the incoming argument array,
