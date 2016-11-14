@@ -15,10 +15,10 @@ func TestNewTag(t *testing.T) {
 	}
 
 	expecteds := [4]Tag{
-		Tag{"a", "href", "a[href]"},
-		Tag{"img", "src", "img[src]"},
-		Tag{"link", "href", "link[href]"},
-		Tag{"dontcare", "src", "dontcare[src]"},
+		{"a", "href", "a[href]"},
+		{"img", "src", "img[src]"},
+		{"link", "href", "link[href]"},
+		{"dontcare", "src", "dontcare[src]"},
 	}
 
 	for i := range names {
@@ -38,12 +38,12 @@ func TestTagFinder(t *testing.T) {
 	var f Finder = NewTag("a")
 
 	if f.(Tag).CSSSelector != f.Find() {
-		t.Errorf("Find() should return the CSS selector")
+		t.Error("Find() should return the CSS selector")
 	}
 
 	act := doc.Find(f.Find())
 	if act.Size() != 1 {
-		t.Errorf("expected only one a[href] match.")
+		t.Error("expected only one a[href] match.")
 	}
 }
 
@@ -55,22 +55,22 @@ func TestTagMapper(t *testing.T) {
 
 	act := doc.Find("a").Map(m.Map())
 	if act[0] != "http://www.example.com/" {
-		t.Errorf("Map should have resulted in extracting the url.")
+		t.Error("Map should have resulted in extracting the url.")
 	}
 
 	// negative
 	act = doc.Find("img").Map(m.Map())
 	if len(act) != 0 {
-		t.Errorf("Map should have 0 entries.")
+		t.Error("Map should have 0 entries.")
 	}
 
 	m = NewTag("dontcare")
 	act = doc.Find("dontcare").Map(m.Map())
 	if len(act) != 1 {
-		t.Errorf("Map should have 1 entry")
+		t.Error("Map should have 1 entry")
 	}
 	if act[0] != "" {
-		t.Errorf("first value should be empty")
+		t.Error("first value should be empty")
 	}
 }
 
@@ -84,7 +84,7 @@ func TestFindMap(t *testing.T) {
 	act := FindMap(res, fm)
 
 	if len(act) != 1 {
-		t.Errorf("Map should have 1 entry")
+		t.Error("Map should have 1 entry")
 	}
 
 	if act[0] != exp[0] {

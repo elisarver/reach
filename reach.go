@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"net/url"
@@ -40,10 +41,10 @@ func init() {
 
 	flag.Usage = func() {
 		cmd := filepath.Base(os.Args[0])
-		fmt.Fprintf(os.Stderr, "Reach gathers urls from a website.\n\n")
+		fmt.Fprint(os.Stderr, "Reach gathers urls from a website.\n\n")
 		fmt.Fprintf(os.Stderr,
 			"Usage:\n\n  %s [-t=\"a\" | -tag=\"img\"] URLs...\n", cmd)
-		fmt.Fprintf(os.Stderr, examples)
+		fmt.Fprint(os.Stderr, examples)
 	}
 
 	flag.StringVar(&pTag, "tag", defaultTag, tagUsage)
@@ -83,7 +84,7 @@ func main() {
 func argTargets(args []string) ([]Target, error) {
 	numArgs := len(args)
 	if numArgs == 0 {
-		return []Target{}, fmt.Errorf("Please supply at least one URL.")
+		return []Target{}, errors.New("Please supply at least one URL.")
 	}
 	t := Target{&url.URL{}}
 	return t.ParseAll(args)
@@ -92,7 +93,7 @@ func argTargets(args []string) ([]Target, error) {
 // ParseAll converts arguments into a list of URLs.
 func (t Target) ParseAll(args []string) ([]Target, error) {
 	ts := make([]Target, 0, len(args))
-	for i, _ := range args {
+	for i := range args {
 		if targ, err := t.Parse(args[i]); err != nil {
 			return []Target{}, err
 		} else {
@@ -116,7 +117,7 @@ func dropEmpties(list []string) []string {
 func trap(err error) {
 	if err != nil {
 		flag.Usage()
-		fmt.Fprint(os.Stderr, fmt.Errorf(errorHeader+err.Error()+"\n\n"))
+		fmt.Fprint(os.Stderr, fmt.Errorf("%s%s\n\n", errorHeader, err.Error()))
 		os.Exit(1)
 	}
 }
