@@ -14,8 +14,12 @@ type Tag struct {
 }
 
 // NewTag creates a new tag with the appropriate attributes built-in.
+// defaults to <a> tag.
 func NewTag(name string) Tag {
-	t := Tag{name, "", ""}
+	if name == "" {
+		name = "a"
+	}
+	t := Tag{Name: name}
 
 	switch t.Name {
 	default:

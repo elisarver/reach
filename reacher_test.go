@@ -9,32 +9,25 @@ import (
 
 // tags represent finders
 func TestNewTag(t *testing.T) {
-
-	names := [4]string{
-		"a", "img", "link", "dontcare",
-	}
-
-	expecteds := [4]Tag{
-		{"a", "href", "a[href]"},
-		{"img", "src", "img[src]"},
-		{"link", "href", "link[href]"},
-		{"dontcare", "src", "dontcare[src]"},
-	}
-
-	for i := range names {
-		name := names[i]
-		act := NewTag(name)
-		exp := expecteds[i]
-
-		if act != exp {
-			t.Errorf("expected %q, got %q", exp, act)
+	for _, pair := range []struct {
+		tagname  string
+		expected Tag
+	}{
+		{"", Tag{"a", "href", "a[href]"}},
+		{"a", Tag{"a", "href", "a[href]"}},
+		{"img", Tag{"img", "src", "img[src]"}},
+		{"link", Tag{"link", "href", "link[href]"}},
+		{"dontcare", Tag{"dontcare", "src", "dontcare[src]"}},
+	} {
+		actual := NewTag(pair.tagname)
+		if pair.expected != actual {
+			t.Errorf("expected %q, got %q", pair.expected, actual)
 		}
 	}
 }
 
 func TestTagFinder(t *testing.T) {
-	doc, _ := goquery.NewDocumentFromReader(
-		strings.NewReader("<a href='http://www.example.com/'/>"))
+	doc := genDoc(t, "<a href='http://www.example.com/'/>")
 	var f Selector = NewTag("a")
 
 	if f.(Tag).CSSSelector != f.Select() {
@@ -48,9 +41,7 @@ func TestTagFinder(t *testing.T) {
 }
 
 func TestTagMapper(t *testing.T) {
-	doc, _ := goquery.NewDocumentFromReader(
-		strings.NewReader("<a href='http://www.example.com/'/><link href=''/><dontcare/>"))
-
+	doc := genDoc(t, "<a href='http://www.example.com/'/><link href=''/><dontcare/>")
 	var m Mapper = NewTag("a")
 
 	act := doc.Find("a").Map(m.Map())
@@ -75,13 +66,10 @@ func TestTagMapper(t *testing.T) {
 }
 
 func TestSelectMap(t *testing.T) {
-	var res *goquery.Document
-	res, _ = goquery.NewDocumentFromReader(
-		strings.NewReader("<a href='http://www.example.com/'/><link href=''/><dontcare/>"))
-
+	doc := genDoc(t, "<a href='http://www.example.com/'/><link href=''/><dontcare/>")
 	var fm SelectorMapper = NewTag("a")
 	exp := []string{"http://www.example.com/"}
-	act := SelectMap(res, fm)
+	act := SelectMap(doc, fm)
 
 	if len(act) != 1 {
 		t.Error("Map should have 1 entry")
@@ -90,4 +78,15 @@ func TestSelectMap(t *testing.T) {
 	if act[0] != exp[0] {
 		t.Errorf("expected %q, got %q", exp[0], act[0])
 	}
+}
+
+func genDoc(t *testing.T, s string) *goquery.Document {
+	var (
+		res *goquery.Document
+		err error
+	)
+	if res, err = goquery.NewDocumentFromReader(strings.NewReader(s)); err == nil {
+		t.Error(err)
+	}
+	return res
 }
