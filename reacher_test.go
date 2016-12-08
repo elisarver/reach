@@ -85,7 +85,7 @@ func genDoc(t *testing.T, s string) *goquery.Document {
 		res *goquery.Document
 		err error
 	)
-	if res, err = goquery.NewDocumentFromReader(strings.NewReader(s)); err == nil {
+	if res, err = goquery.NewDocumentFromReader(strings.NewReader(s)); err != nil {
 		t.Error(err)
 	}
 	return res
