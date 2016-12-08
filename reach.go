@@ -32,7 +32,6 @@ Examples:
   http://example.com/about
 
 `
-	errorHeader = "\nERROR:\n\n  "
 )
 
 func init() {
@@ -92,7 +91,7 @@ func reachTargets(ts []Target, tagName string, reachFn rf) []string {
 func argTargets(args []string) ([]Target, error) {
 	numArgs := len(args)
 	if numArgs == 0 {
-		return []Target{}, errors.New("Please supply at least one URL.")
+		return []Target{}, errors.New("please supply at least one URL")
 	}
 	t := Target{&url.URL{}}
 	return t.ParseAll(args)
@@ -126,7 +125,7 @@ func dropEmpties(list []string) []string {
 func trap(err error) {
 	if err != nil {
 		flag.Usage()
-		fmt.Fprint(os.Stderr, fmt.Errorf("%s%s\n\n", errorHeader, err.Error()))
+		fmt.Fprintln(os.Stderr, fmt.Errorf("%s", err.Error()))
 		os.Exit(1)
 	}
 }
