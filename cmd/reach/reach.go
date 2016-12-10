@@ -35,13 +35,13 @@ Examples:
   http://example.com/about
 
 `
+	defaultTag = "a"
+	tagUsage   = "Tag to search for."
 )
 
+var ()
+
 func init() {
-	const (
-		defaultTag = "a"
-		tagUsage   = "Tag to search for."
-	)
 
 	flag.Usage = func() {
 		cmd := filepath.Base(os.Args[0])
@@ -53,15 +53,14 @@ func init() {
 
 	flag.StringVar(&pTag, "tag", defaultTag, tagUsage)
 	flag.StringVar(&pTag, "t", defaultTag, tagUsage+" (Shorthand)")
+	flag.Parse()
 }
 
 func main() {
-	flag.Parse()
-
-	ts, err := argTargets(flag.Args())
+	targets, err := argTargets(flag.Args())
 	trap(err)
 
-	output := reachTargets(ts, pTag, Reach)
+	output := reachTargets(targets, pTag, Reach)
 	fmt.Print(strings.Join(output, "\n"))
 	fmt.Println()
 }
