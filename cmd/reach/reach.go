@@ -10,13 +10,13 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/elisarver/reach/reacher"
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
-	"github.com/elisarver/reach/reacher"
 )
 
 var (
-	pTag string 
+	pTag string
 )
 
 const (
@@ -77,7 +77,7 @@ func reachTargets(ts []*target.Target, tagName string, reachFn rf) []string {
 		resp, err := reachFn(t)
 		trap(err)
 
-		URLs := reacher.SelectMap(resp, tag)
+		URLs := reacher.SelectMap(resp, reacher.TagSelectorMapper(tag))
 
 		output[i] = strings.Join(dropEmpties(URLs), "\n")
 	}
