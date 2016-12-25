@@ -9,12 +9,12 @@ import (
 	"testing"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/elisarver/reach/target" 
+	"github.com/elisarver/reach/target"
 )
 
 func TestArgTargets(t *testing.T) {
 	type pair struct {
-		targets []*target.Target
+		targets []target.Target
 		err     error
 	}
 
@@ -33,7 +33,7 @@ func TestArgTargets(t *testing.T) {
 		urls[i], errs[i] = url.ParseRequestURI(ustr[i])
 	}
 
-	argss := [][]string{ 
+	argss := [][]string{
 		{},
 		{ustr[0]},
 		{ustr[0], ustr[1]},
@@ -41,10 +41,10 @@ func TestArgTargets(t *testing.T) {
 	}
 
 	expecteds := []pair{
-		{[]*target.Target{}, errors.New("please supply at least one URL")},
-		{[]*target.Target{{URL: urls[0]}}, nil},
-		{[]*target.Target{{URL: urls[0]}, {URL: urls[1]}}, nil},
-		{[]*target.Target{}, errs[2]},
+		{[]target.Target{}, errors.New("please supply at least one URL")},
+		{[]target.Target{{URL: urls[0]}}, nil},
+		{[]target.Target{{URL: urls[0]}, {URL: urls[1]}}, nil},
+		{[]target.Target{}, errs[2]},
 	}
 
 	for i := range argss {
@@ -85,12 +85,12 @@ func TestArgTargets(t *testing.T) {
 
 // reachTargets(ts []Target, tagName string, reachFn func(string) (*goquery.Document, error)) []string {
 func TestReachTargets(t *testing.T) {
-	reachFnSuccess := func(_ *target.Target) (*goquery.Document, error) {
+	reachFnSuccess := func(_ target.Target) (*goquery.Document, error) {
 		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a></body></html>")
 		return goquery.NewDocumentFromReader(r)
 	}
 	u, _ := target.NewTarget("http://foo.bar/")
-	us := []*target.Target{u}
+	us := []target.Target{u}
 	actual := reachTargets(us, "a", reachFnSuccess)
 	expected := []string{"http://foo.bar/"}
 	if !reflect.DeepEqual(actual, expected) {

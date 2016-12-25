@@ -1,4 +1,4 @@
-// Package testhelp are re-usable test helpers for all modules in reach. 
+// Package testhelp are re-usable test helpers for all modules in reach.
 package testhelp
 
 import (

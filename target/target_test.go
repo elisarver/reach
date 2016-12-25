@@ -21,7 +21,7 @@ func TestNewTarget(t *testing.T) {
 	}
 	for instance, test := range tests {
 		reporter := testhelp.Errmsg(t, instance)
-		fn := func() (*Target, error) {
+		fn := func() (Target, error) {
 			return NewTarget(test.input)
 		}
 		reportOn(reporter, fn, test.expected)
@@ -36,7 +36,7 @@ func TestParse(t *testing.T) {
 	for instance, test := range tests {
 		reporter := testhelp.Errmsg(t, instance)
 		t := &Target{URL: u}
-		fn := func() (*Target, error) {
+		fn := func() (Target, error) {
 			return t.Parse(test.input)
 		}
 		reportOn(reporter, fn, test.expected)
@@ -47,7 +47,7 @@ type Stringer interface {
 	String() string
 }
 
-type Targeter func() (*Target, error)
+type Targeter func() (Target, error)
 
 func reportOn(reporter testhelp.Reporter, fn Targeter, expected interface{}) {
 	target, err := fn()

@@ -39,8 +39,6 @@ Examples:
 	tagUsage   = "Tag to search for."
 )
 
-var ()
-
 func init() {
 
 	flag.Usage = func() {
@@ -65,9 +63,9 @@ func main() {
 	fmt.Println()
 }
 
-type rf func(*target.Target) (*goquery.Document, error)
+type rf func(target.Target) (*goquery.Document, error)
 
-func reachTargets(ts []*target.Target, tagName string, reachFn rf) []string {
+func reachTargets(ts []target.Target, tagName string, reachFn rf) []string {
 	var (
 		output = make([]string, len(ts))
 		tag    = tag.NewTag(tagName)
@@ -84,7 +82,7 @@ func reachTargets(ts []*target.Target, tagName string, reachFn rf) []string {
 }
 
 // Reach function retrieves a goquery Document for a URL
-func Reach(t *target.Target) (*goquery.Document, error) {
+func Reach(t target.Target) (*goquery.Document, error) {
 	return goquery.NewDocument(t.String())
 }
 
@@ -95,10 +93,10 @@ func Reach(t *target.Target) (*goquery.Document, error) {
 // type, we pass back a slice of Target. This is not a
 // pointer, so a nil check is unnecessary. Target aliases
 // to strings verified by this function.
-func argTargets(args []string) ([]*target.Target, error) {
+func argTargets(args []string) ([]target.Target, error) {
 	numArgs := len(args)
 	if numArgs == 0 {
-		return []*target.Target{}, errors.New("please supply at least one URL")
+		return []target.Target{}, errors.New("please supply at least one URL")
 	}
 	t := target.Target{URL: &url.URL{}}
 	return t.ParseAll(args)
