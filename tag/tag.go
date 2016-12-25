@@ -11,11 +11,11 @@ type Tag struct {
 
 // NewTag creates a new tag with the appropriate attributes built-in.
 // defaults to <a> tag.
-func NewTag(name string) Tag {
+func NewTag(name string) *Tag {
 	if name == "" {
 		name = "a"
 	}
-	t := Tag{Name: name}
+	t := &Tag{Name: name}
 	switch t.Name {
 	default:
 		t.Attribute = "src"

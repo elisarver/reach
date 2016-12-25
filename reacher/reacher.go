@@ -28,7 +28,9 @@ func SelectMap(doc *goquery.Document, fm SelectorMapper) []string {
 }
 
 // TagSelectorMapper applies SelectorMapper to Tag
-type TagSelectorMapper tag.Tag
+type TagSelectorMapper struct {
+	*tag.Tag
+}
 
 // Select returns a tag's CSS select string.
 func (tr TagSelectorMapper) Select() string {

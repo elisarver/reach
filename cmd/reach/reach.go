@@ -74,7 +74,7 @@ func reachTargets(ts []target.Target, tagName string, reachFn rf) []string {
 		resp, err := reachFn(t)
 		trap(err)
 
-		URLs := reacher.SelectMap(resp, reacher.TagSelectorMapper(tag))
+		URLs := reacher.SelectMap(resp, reacher.TagSelectorMapper{Tag: tag})
 
 		output[i] = strings.Join(dropEmpties(URLs), "\n")
 	}

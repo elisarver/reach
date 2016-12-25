@@ -21,8 +21,8 @@ func TestNewTag(t *testing.T) {
 	for instance, test := range tests {
 		reporter := testhelp.Errmsg(t, instance)
 		actual := NewTag(test.tagname)
-		if test.expected != actual {
-			reporter("expected %q, got %q", test.expected, actual)
+		if test.expected != *actual {
+			reporter("expected %q, got %q", test.expected, *actual)
 		}
 	}
 }

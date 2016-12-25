@@ -10,7 +10,7 @@ import (
 
 func TestTagFinder(t *testing.T) {
 	doc := genDoc(t, "<a href='http://www.example.com/'/>")
-	f := TagSelectorMapper(tag.NewTag("a"))
+	f := TagSelectorMapper{tag.NewTag("a")}
 
 	if f.CSSSelector != f.Select() {
 		t.Error("Select() should return the CSS selector")
@@ -24,7 +24,7 @@ func TestTagFinder(t *testing.T) {
 
 func TestTagMapper(t *testing.T) {
 	doc := genDoc(t, "<a href='http://www.example.com/'/><link href=''/><dontcare/>")
-	m := TagSelectorMapper(tag.NewTag("a"))
+	m := TagSelectorMapper{tag.NewTag("a")}
 
 	act := doc.Find("a").Map(m.Map())
 	if act[0] != "http://www.example.com/" {
@@ -37,7 +37,7 @@ func TestTagMapper(t *testing.T) {
 		t.Error("Map should have 0 entries.")
 	}
 
-	m = TagSelectorMapper(tag.NewTag("dontcare"))
+	m = TagSelectorMapper{tag.NewTag("dontcare")}
 	act = doc.Find("dontcare").Map(m.Map())
 	if len(act) != 1 {
 		t.Error("Map should have 1 entry")
@@ -49,7 +49,7 @@ func TestTagMapper(t *testing.T) {
 
 func TestSelectMap(t *testing.T) {
 	doc := genDoc(t, "<a href='http://www.example.com/'/><link href=''/><dontcare/>")
-	fm := TagSelectorMapper(tag.NewTag("a"))
+	fm := TagSelectorMapper{tag.NewTag("a")}
 	exp := []string{"http://www.example.com/"}
 	act := SelectMap(doc, fm)
 
