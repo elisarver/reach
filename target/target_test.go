@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	"github.com/elisarver/reach/testhelp"
+	"reflect"
 )
 
 type InputExpected map[string]struct {
-	input    string
+	input    interface{}
 	expected interface{}
 }
 
@@ -22,7 +23,7 @@ func TestNewTarget(t *testing.T) {
 	for instance, test := range tests {
 		reporter := testhelp.Errmsg(t, instance)
 		fn := func() (Target, error) {
-			return NewTarget(test.input)
+			return NewTarget(test.input.(string))
 		}
 		reportOn(reporter, fn, test.expected)
 	}
@@ -37,7 +38,7 @@ func TestParse(t *testing.T) {
 		reporter := testhelp.Errmsg(t, instance)
 		t := &Target{URL: u}
 		fn := func() (Target, error) {
-			return t.Parse(test.input)
+			return t.Parse(test.input.(string))
 		}
 		reportOn(reporter, fn, test.expected)
 	}
@@ -59,5 +60,22 @@ func reportOn(reporter testhelp.Reporter, fn Targeter, expected interface{}) {
 	}
 	if actual != expected {
 		reporter("expeced %q, got %q", expected, actual)
+	}
+}
+
+type InputMultiExpected map[string]interface{}
+
+func TestParseAll(t *testing.T) {
+	result, err := ParseAll([]string{})
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
+	result, err = ParseAll([]string{"http://google.com/"})
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
+	expected := []Target{{testhelp.NewURL(t, "http://google.com/")}}
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("results don't match. expected %v, got %v", expected, result)
 	}
 }

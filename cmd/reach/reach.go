@@ -48,31 +48,22 @@ func main() {
 	flag.StringVar(&pTag, "t", "a", tagUsage+" (Shorthand)")
 	flag.Parse()
 
-	targets, err := argTargets(flag.Args())
+	if len(flag.Args()) == 0 {
+		fmt.Fprintln(os.Stderr, ErrOneURL.Error())
+		os.Exit(1)
+	}
+
+	targets, err := target.ParseAll(flag.Args())
 	if err != nil {
-		flag.Usage()
-		fmt.Fprintln(os.Stderr, fmt.Errorf("%s", err.Error()))
+		fmt.Fprintln(os.Stderr, ErrOneURL.Error())
 		os.Exit(1)
 	}
 
 	output, err := reacher.ReachTargets(targets, pTag, nil)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, fmt.Errorf("unexpected error %s", err.Error()))
+		os.Exit(1)
 	}
 	fmt.Print(strings.Join(output, "\n"))
 	fmt.Println()
-}
-
-// argTargets filters the incoming argument array,
-// verifying that the parameters are able to provide
-// request URIs. Returns a list of targets or an error.
-// Always check error! In order to return a good default
-// type, we pass back a slice of Target. This is not a
-// pointer, so a nil check is unnecessary. Target aliases
-// to strings verified by this function.
-func argTargets(args []string) ([]target.Target, error) {
-	if len(args) == 0 {
-		return []target.Target{}, ErrOneURL
-	}
-	return target.ParseAll(args)
 }
