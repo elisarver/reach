@@ -4,7 +4,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,7 +15,7 @@ import (
 )
 
 var (
-	pTag string
+	ErrOneURL = errors.New("please supply at least one URL")
 )
 
 const (
@@ -33,14 +32,10 @@ Examples:
   > reach http://example.com/ | sort | uniq
   http://example.com/blog
   http://example.com/about
-
 `
-	defaultTag = "a"
-	tagUsage   = "Tag to search for."
 )
 
-func init() {
-
+func main() {
 	flag.Usage = func() {
 		cmd := filepath.Base(os.Args[0])
 		fmt.Fprint(os.Stderr, "Reach gathers urls from a website.\n\n")
@@ -49,41 +44,48 @@ func init() {
 		fmt.Fprint(os.Stderr, examples)
 	}
 
-	flag.StringVar(&pTag, "tag", defaultTag, tagUsage)
-	flag.StringVar(&pTag, "t", defaultTag, tagUsage+" (Shorthand)")
+	var pTag string
+	tagUsage := "Tag to search for."
+	flag.StringVar(&pTag, "tag", "a", tagUsage)
+	flag.StringVar(&pTag, "t", "a", tagUsage+" (Shorthand)")
 	flag.Parse()
-}
 
-func main() {
 	targets, err := argTargets(flag.Args())
-	trap(err)
+	if err != nil {
+		flag.Usage()
+		fmt.Fprintln(os.Stderr, fmt.Errorf("%s", err.Error()))
+		os.Exit(1)
+	}
 
-	output := reachTargets(targets, pTag, Reach)
+	output, err := reachTargets(targets, pTag, nil)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, fmt.Errorf("unexpected error %s", err.Error()))
+	}
 	fmt.Print(strings.Join(output, "\n"))
 	fmt.Println()
 }
 
-type rf func(target.Target) (*goquery.Document, error)
+type rf func(string) (*goquery.Document, error)
 
-func reachTargets(ts []target.Target, tagName string, reachFn rf) []string {
+func reachTargets(ts []target.Target, tagName string, fn rf) ([]string, error) {
+	if fn == nil {
+		fn = goquery.NewDocument
+	}
 	var (
 		output = make([]string, len(ts))
 		tag    = tag.NewTag(tagName)
 	)
 	for i, t := range ts {
-		resp, err := reachFn(t)
-		trap(err)
+		resp, err := fn(t.String())
+		if err != nil {
+			return []string{}, err
+		}
 
 		URLs := reacher.SelectMap(resp, reacher.TagSelectorMapper{Tag: tag})
 
 		output[i] = strings.Join(dropEmpties(URLs), "\n")
 	}
-	return output
-}
-
-// Reach function retrieves a goquery Document for a URL
-func Reach(t target.Target) (*goquery.Document, error) {
-	return goquery.NewDocument(t.String())
+	return output, nil
 }
 
 // argTargets filters the incoming argument array,
@@ -94,12 +96,10 @@ func Reach(t target.Target) (*goquery.Document, error) {
 // pointer, so a nil check is unnecessary. Target aliases
 // to strings verified by this function.
 func argTargets(args []string) ([]target.Target, error) {
-	numArgs := len(args)
-	if numArgs == 0 {
-		return []target.Target{}, errors.New("please supply at least one URL")
+	if len(args) == 0 {
+		return []target.Target{}, ErrOneURL
 	}
-	t := target.Target{URL: &url.URL{}}
-	return t.ParseAll(args)
+	return target.ParseAll(args)
 }
 
 // dropEmpties eliminates empty values from a list of strings.
@@ -111,12 +111,4 @@ func dropEmpties(list []string) []string {
 		}
 	}
 	return newList
-}
-
-func trap(err error) {
-	if err != nil {
-		flag.Usage()
-		fmt.Fprintln(os.Stderr, fmt.Errorf("%s", err.Error()))
-		os.Exit(1)
-	}
 }

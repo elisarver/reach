@@ -85,13 +85,16 @@ func TestArgTargets(t *testing.T) {
 
 // reachTargets(ts []Target, tagName string, reachFn func(string) (*goquery.Document, error)) []string {
 func TestReachTargets(t *testing.T) {
-	reachFnSuccess := func(_ target.Target) (*goquery.Document, error) {
+	reachFnSuccess := func(_ string) (*goquery.Document, error) {
 		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a></body></html>")
 		return goquery.NewDocumentFromReader(r)
 	}
 	u, _ := target.NewTarget("http://foo.bar/")
 	us := []target.Target{u}
-	actual := reachTargets(us, "a", reachFnSuccess)
+	actual, err := reachTargets(us, "a", reachFnSuccess)
+	if err != nil {
+		t.Errorf("test didn't expect %s", err)
+	}
 	expected := []string{"http://foo.bar/"}
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("expected %v, got %v", expected, actual)
