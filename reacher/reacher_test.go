@@ -1,11 +1,14 @@
 package reacher
 
 import (
+	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/elisarver/reach/tag"
+	"github.com/elisarver/reach/target"
 )
 
 func TestTagFinder(t *testing.T) {
@@ -71,4 +74,32 @@ func genDoc(t *testing.T, s string) *goquery.Document {
 		t.Error(err)
 	}
 	return res
+}
+
+// reachTargets(ts []Target, tagName string, reachFn func(string) (*goquery.Document, error)) []string {
+func TestReachTargets(t *testing.T) {
+	reachFnSuccess := func(_ string) (*goquery.Document, error) {
+		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a></body></html>")
+		return goquery.NewDocumentFromReader(r)
+	}
+	u, _ := target.NewTarget("http://foo.bar/")
+	us := []target.Target{u}
+	actual, err := ReachTargets(us, "a", reachFnSuccess)
+	if err != nil {
+		t.Errorf("test didn't expect %s", err)
+	}
+	expected := []string{"http://foo.bar/"}
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("expected %v, got %v", expected, actual)
+	}
+}
+
+func TestDropEmpties(t *testing.T) {
+	input := []string{"not empty", "", "also not empty"}
+	expected := fmt.Sprintf("%q", []string{"not empty", "also not empty"})
+	actual := fmt.Sprintf("%q", dropEmpties(input))
+	if expected != actual {
+		t.Errorf("dropEmpties failed!\nExpected:\n\t%s\nGot:\n\t%s\n",
+			expected, actual)
+	}
 }

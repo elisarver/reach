@@ -8,9 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/elisarver/reach/reacher"
-	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
 )
 
@@ -57,35 +55,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	output, err := reachTargets(targets, pTag, nil)
+	output, err := reacher.ReachTargets(targets, pTag, nil)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, fmt.Errorf("unexpected error %s", err.Error()))
 	}
 	fmt.Print(strings.Join(output, "\n"))
 	fmt.Println()
-}
-
-type rf func(string) (*goquery.Document, error)
-
-func reachTargets(ts []target.Target, tagName string, fn rf) ([]string, error) {
-	if fn == nil {
-		fn = goquery.NewDocument
-	}
-	var (
-		output = make([]string, len(ts))
-		tag    = tag.NewTag(tagName)
-	)
-	for i, t := range ts {
-		resp, err := fn(t.String())
-		if err != nil {
-			return []string{}, err
-		}
-
-		URLs := reacher.SelectMap(resp, reacher.TagSelectorMapper{Tag: tag})
-
-		output[i] = strings.Join(dropEmpties(URLs), "\n")
-	}
-	return output, nil
 }
 
 // argTargets filters the incoming argument array,
@@ -100,15 +75,4 @@ func argTargets(args []string) ([]target.Target, error) {
 		return []target.Target{}, ErrOneURL
 	}
 	return target.ParseAll(args)
-}
-
-// dropEmpties eliminates empty values from a list of strings.
-func dropEmpties(list []string) []string {
-	newList := make([]string, 0, len(list))
-	for i := range list {
-		if list[i] != "" {
-			newList = append(newList, list[i])
-		}
-	}
-	return newList
 }
