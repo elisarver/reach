@@ -12,7 +12,7 @@ type Reporter func(message string, values ...interface{})
 
 // Errmsg returns a function that works like fmt.Errorf, but logs the test information
 // and runs it through t's Errorf.
-func Errmsg(t *testing.T, instance string) func(message string, values ...interface{}) {
+func Errmsg(t *testing.T, instance string) Reporter {
 	return func(message string, values ...interface{}) {
 		t.Errorf(fmt.Sprintf("%s: %s", instance, message), values...)
 	}
