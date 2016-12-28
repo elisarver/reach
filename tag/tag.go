@@ -10,7 +10,10 @@ type Tag struct {
 }
 
 // NewTag creates a new tag with the appropriate attributes built-in.
-// defaults to <a> tag.
+//
+// defaults to 'a' tag Name. defaults to 'src' Attribute, unless a or link, in which case it is 'href'
+// 
+// Call NewTag if you have no tag, or have no Attribute to give.
 func NewTag(name string) *Tag {
 	if name == "" {
 		name = "a"

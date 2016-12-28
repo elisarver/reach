@@ -1,8 +1,6 @@
 package reacher
 
 import (
-	"strings"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
@@ -51,23 +49,20 @@ func (tr TagSelectorMapper) Map() func(int, *goquery.Selection) string {
 // ReacherFunction exists to make testing possible without resorting to hardcoded function.
 type ReacherFunction func(string) (*goquery.Document, error)
 
-func ReachTargets(ts []target.Target, tagName string, fn ReacherFunction) ([]string, error) {
+func ReachTargets(ts []target.Target, tags []*tag.Tag, fn ReacherFunction) ([]string, error) {
 	if fn == nil {
 		fn = goquery.NewDocument
 	}
-	var (
-		output = make([]string, len(ts))
-		tag    = tag.NewTag(tagName)
-	)
-	for i, t := range ts {
+	 
+	var	output []string
+	for _, t := range ts {
 		resp, err := fn(t.String())
 		if err != nil {
 			return []string{}, err
 		}
-
-		URLs := SelectMap(resp, TagSelectorMapper{Tag: tag})
-
-		output[i] = strings.Join(dropEmpties(URLs), "\n")
+		for _, tag := range tags { 
+			output = append(output, dropEmpties(SelectMap(resp, TagSelectorMapper{Tag: tag}))...)
+		}
 	}
 	return output, nil
 }

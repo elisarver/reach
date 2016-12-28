@@ -79,16 +79,17 @@ func genDoc(t *testing.T, s string) *goquery.Document {
 // reachTargets(ts []Target, tagName string, reachFn func(string) (*goquery.Document, error)) []string {
 func TestReachTargets(t *testing.T) {
 	reachFnSuccess := func(_ string) (*goquery.Document, error) {
-		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a></body></html>")
+		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a><img src='/logo.png'/></body></html>")
 		return goquery.NewDocumentFromReader(r)
 	}
 	u, _ := target.NewTarget("http://foo.bar/")
 	us := []target.Target{u}
-	actual, err := ReachTargets(us, "a", reachFnSuccess)
+	tags := []*tag.Tag{tag.NewTag("a"),tag.NewTag("img")}
+	actual, err := ReachTargets(us, tags, reachFnSuccess)
 	if err != nil {
 		t.Errorf("test didn't expect %s", err)
 	}
-	expected := []string{"http://foo.bar/"}
+	expected := []string{"http://foo.bar/", "/logo.png"}
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("expected %v, got %v", expected, actual)
 	}
