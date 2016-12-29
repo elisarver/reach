@@ -38,6 +38,11 @@ Examples:
   > reach -t img,a http://example.com/
   /example.png
   /about.html
+
+  Or attributes:
+
+  > reach -t img:class http://example.com/
+  logo
 `
 )
 
