@@ -84,7 +84,7 @@ func TestReachTargets(t *testing.T) {
 	}
 	u, _ := target.NewTarget("http://foo.bar/")
 	us := []target.Target{u}
-	tags := []*tag.Tag{tag.NewTag("a"),tag.NewTag("img")}
+	tags := []*tag.Tag{tag.NewTag("a"), tag.NewTag("img")}
 	actual, err := ReachTargets(us, tags, reachFnSuccess)
 	if err != nil {
 		t.Errorf("test didn't expect %s", err)

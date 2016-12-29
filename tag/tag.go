@@ -1,6 +1,7 @@
 package tag
 
 import "fmt"
+import "strings"
 
 // Tag represents an html tag
 type Tag struct {
@@ -12,19 +13,33 @@ type Tag struct {
 // NewTag creates a new tag with the appropriate attributes built-in.
 //
 // defaults to 'a' tag Name. defaults to 'src' Attribute, unless a or link, in which case it is 'href'
-// 
+//
+// tagSpec is a string of the form [tag]:[attr]
+//
 // Call NewTag if you have no tag, or have no Attribute to give.
-func NewTag(name string) *Tag {
-	if name == "" {
-		name = "a"
+func NewTag(tagSpec string) *Tag {
+	spec := strings.Split(tagSpec, ":")
+	var tag, attr string
+	if len(spec) > 0 && spec[0] != "" {
+		tag = spec[0]
 	}
-	t := &Tag{Name: name}
-	switch t.Name {
-	default:
-		t.Attribute = "src"
-	case "a", "link":
-		t.Attribute = "href"
+	if len(spec) > 1 && spec[1] != "" {
+		attr = spec[1]
 	}
-	t.CSSSelector = fmt.Sprintf("%s[%s]", t.Name, t.Attribute)
+	if tag == "" {
+		tag = "a"
+	}
+	if attr == "" {
+		switch tag {
+		default:
+			attr = "src"
+		case "a", "link":
+			attr = "href"
+		}
+	}
+	t := &Tag{
+		Name:        tag,
+		Attribute:   attr,
+		CSSSelector: fmt.Sprintf("%s[%s]", tag, attr)}
 	return t
 }

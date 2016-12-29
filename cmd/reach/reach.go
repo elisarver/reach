@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/elisarver/reach/reacher"
-	"github.com/elisarver/reach/target"
 	"github.com/elisarver/reach/tag"
+	"github.com/elisarver/reach/target"
 )
 
 var (
@@ -61,10 +61,12 @@ func main() {
 	}
 
 	tagsList := strings.Split(pTag, ",")
-	tags := make([]*tag.Tag, len(tagsList))
-	for i, v := range tagsList {
-		tags[i] = tag.NewTag(v)
+	tags := make([]*tag.Tag, 0, len(tagsList))
+
+	for _, v := range tagsList {
+		tags = append(tags, tag.NewTag(v))
 	}
+
 	if len(flag.Args()) == 0 {
 		fmt.Fprintln(os.Stderr, ErrOneURL.Error())
 	}

@@ -12,11 +12,12 @@ func TestNewTag(t *testing.T) {
 		tagname  string
 		expected Tag
 	}{
-		"empty":   {tagname: "", expected: Tag{Name: "a", Attribute: "href", CSSSelector: "a[href]"}},
-		"anchor":  {tagname: "a", expected: Tag{Name: "a", Attribute: "href", CSSSelector: "a[href]"}},
-		"img":     {tagname: "img", expected: Tag{Name: "img", Attribute: "src", CSSSelector: "img[src]"}},
-		"link":    {tagname: "link", expected: Tag{Name: "link", Attribute: "href", CSSSelector: "link[href]"}},
-		"default": {tagname: "default", expected: Tag{Name: "default", Attribute: "src", CSSSelector: "default[src]"}},
+		"empty":     {tagname: "", expected: Tag{Name: "a", Attribute: "href", CSSSelector: "a[href]"}},
+		"anchor":    {tagname: "a", expected: Tag{Name: "a", Attribute: "href", CSSSelector: "a[href]"}},
+		"img":       {tagname: "img", expected: Tag{Name: "img", Attribute: "src", CSSSelector: "img[src]"}},
+		"link":      {tagname: "link", expected: Tag{Name: "link", Attribute: "href", CSSSelector: "link[href]"}},
+		"meta:name": {tagname: "meta:name", expected: Tag{Name: "meta", Attribute: "name", CSSSelector: "meta[name]"}},
+		"default":   {tagname: "default", expected: Tag{Name: "default", Attribute: "src", CSSSelector: "default[src]"}},
 	}
 	for instance, test := range tests {
 		reporter := testhelp.Errmsg(t, instance)

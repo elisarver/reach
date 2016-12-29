@@ -53,14 +53,14 @@ func ReachTargets(ts []target.Target, tags []*tag.Tag, fn ReacherFunction) ([]st
 	if fn == nil {
 		fn = goquery.NewDocument
 	}
-	 
-	var	output []string
+
+	var output []string
 	for _, t := range ts {
 		resp, err := fn(t.String())
 		if err != nil {
 			return []string{}, err
 		}
-		for _, tag := range tags { 
+		for _, tag := range tags {
 			output = append(output, dropEmpties(SelectMap(resp, TagSelectorMapper{Tag: tag}))...)
 		}
 	}
