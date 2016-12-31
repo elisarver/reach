@@ -46,10 +46,12 @@ func (tr TagSelectorMapper) Map() func(int, *goquery.Selection) string {
 	}
 }
 
-// ReacherFunction exists to make testing possible without resorting to hardcoded function.
-type ReacherFunction func(string) (*goquery.Document, error)
+// DocumentFetcher exists to make testing possible without resorting to hardcoded function.
+type DocumentFetcher func(string) (*goquery.Document, error)
 
-func ReachTargets(ts []target.Target, tags []*tag.Tag, fn ReacherFunction) ([]string, error) {
+// ReachTargets takes a list of targets, a list of tags, and a fetcher, fetches the targets with the
+// fetcher, and finds the tags in the document.
+func ReachTargets(ts []target.Target, tags []*tag.Tag, fn DocumentFetcher) ([]string, error) {
 	if fn == nil {
 		fn = goquery.NewDocument
 	}

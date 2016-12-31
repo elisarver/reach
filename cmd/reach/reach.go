@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	ErrOneURL    = errors.New("please supply at least one URL")
-	ErrEmptyTags = errors.New("empty tag arguments")
+	errOneURL    = errors.New("please supply at least one URL")
+	errEmptyTags = errors.New("empty tag arguments")
 )
 
 func main() {
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	if len(flag.Args()) == 0 {
-		exitErr(ErrOneURL)
+		exitErr(errOneURL)
 	}
 
 	targets, err := target.ParseAll(flag.Args())
