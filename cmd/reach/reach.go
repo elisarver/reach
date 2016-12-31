@@ -33,12 +33,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	tagsList := strings.Split(pTag, ",")
-	tags := make([]*tag.Tag, 0, len(tagsList))
-
-	for _, v := range tagsList {
-		tags = append(tags, tag.NewTag(v))
-	}
+	tags := tag.FromMultiSpec(pTag)
 
 	if len(flag.Args()) == 0 {
 		exitErr(errOneURL)
