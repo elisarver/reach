@@ -25,17 +25,11 @@ func main() {
 	flag.Parse()
 
 	if help {
-		fmt.Fprint(os.Stderr, 
-`Description:
-	reach visits URLs and returns tags/attributes of interest.
-`)
+		fmt.Fprint(os.Stderr,
+			"Description:\n\treach visits URLs and returns tags/attributes of interest.\n")
 		flag.Usage()
-		fmt.Fprint(os.Stderr, 
-`Positional arguments:
-  URL [URL...]
-  	one or more URLs to dial.
-
-`)
+		fmt.Fprint(os.Stderr,
+			"Positional arguments:\n  URL [URL...]\n\tone or more URLs to dial.\n\n")
 		os.Exit(0)
 	}
 
@@ -47,21 +41,23 @@ func main() {
 	}
 
 	if len(flag.Args()) == 0 {
-		fmt.Fprintln(os.Stderr, ErrOneURL)
-		os.Exit(1)
+		exitErr(ErrOneURL)
 	}
 
 	targets, err := target.ParseAll(flag.Args())
-	if err != nil {
-		fmt.Fprintln(os.Stderr, ErrEmptyTags)
-		os.Exit(1)
-	}
+	exitErr(err)
 
 	output, err := reacher.ReachTargets(targets, tags, nil)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, fmt.Errorf("unexpected error %s", err))
-		os.Exit(1)
-	}
+	exitErr(err)
+
 	fmt.Print(strings.Join(output, "\n"))
 	fmt.Println()
+}
+
+func exitErr(err error) {
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, "try `reach -h` for usage.")
+		os.Exit(1)
+	}
 }
