@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/elisarver/reach/reacher"
@@ -15,54 +14,29 @@ import (
 
 var (
 	ErrOneURL    = errors.New("please supply at least one URL")
-	ErrEmptyTags = errors.New("Empty list of tags")
-)
-
-const (
-	examples = `
-Examples:
-
-  Get all img src from a web page:
-
-  > reach -t img http://blog.golang.org
-  http://blog.golang.org/gophergala/fancygopher.jpg
-
-  Get all unique links on a page:
-
-  > reach http://example.com/ | sort | uniq
-  http://example.com/blog
-  http://example.com/about
-
-  Get mutiple types:
-
-  > reach -t img,a http://example.com/
-  /example.png
-  /about.html
-
-  Or attributes:
-
-  > reach -t img:class http://example.com/
-  logo
-`
+	ErrEmptyTags = errors.New("empty tag arguments")
 )
 
 func main() {
-	flag.Usage = func() {
-		cmd := filepath.Base(os.Args[0])
-		fmt.Fprint(os.Stderr, "Reach gathers urls from a website.\n\n")
-		fmt.Fprintf(os.Stderr,
-			"Usage:\n\n  %s [-t=\"a\" | -tag=\"img\"] URLs...\n", cmd)
-		fmt.Fprint(os.Stderr, examples)
-	}
-
 	var pTag string
-	tagUsage := "Tag to search for."
-	flag.StringVar(&pTag, "tag", "a", tagUsage)
-	flag.StringVar(&pTag, "t", "a", tagUsage+" (Shorthand)")
+	flag.StringVar(&pTag, "tag", "a", "comma-separated list of `tags` to search for.\n\tformat: name1[:attribute1][,name2[:attribute2]]")
+	var help bool
+	flag.BoolVar(&help, "h", false, "print help")
 	flag.Parse()
 
-	if pTag == "" {
-		pTag = "a"
+	if help {
+		fmt.Fprint(os.Stderr, 
+`Description:
+	reach visits URLs and returns tags/attributes of interest.
+`)
+		flag.Usage()
+		fmt.Fprint(os.Stderr, 
+`Positional arguments:
+  URL [URL...]
+  	one or more URLs to dial.
+
+`)
+		os.Exit(0)
 	}
 
 	tagsList := strings.Split(pTag, ",")
@@ -73,18 +47,19 @@ func main() {
 	}
 
 	if len(flag.Args()) == 0 {
-		fmt.Fprintln(os.Stderr, ErrOneURL.Error())
+		fmt.Fprintln(os.Stderr, ErrOneURL)
+		os.Exit(1)
 	}
 
 	targets, err := target.ParseAll(flag.Args())
 	if err != nil {
-		fmt.Fprintln(os.Stderr, ErrOneURL.Error())
+		fmt.Fprintln(os.Stderr, ErrEmptyTags)
 		os.Exit(1)
 	}
 
 	output, err := reacher.ReachTargets(targets, tags, nil)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, fmt.Errorf("unexpected error %s", err.Error()))
+		fmt.Fprintln(os.Stderr, fmt.Errorf("unexpected error %s", err))
 		os.Exit(1)
 	}
 	fmt.Print(strings.Join(output, "\n"))
