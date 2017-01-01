@@ -49,25 +49,32 @@ func (tr TagSelectorMapper) Map() func(int, *goquery.Selection) string {
 // DocumentFetcher exists to make testing possible without resorting to hardcoded function.
 type DocumentFetcher func(string) (*goquery.Document, error)
 
-// ReachTargets takes a list of targets, a list of tags, and a fetcher, fetches the targets with the
-// fetcher, and finds the tags in the document.
-func ReachTargets(ts []target.Target, tags []*tag.Tag, fn DocumentFetcher) ([]string, error) {
+// genReachTargets binds the appropriate function to generate a document
+// to the ReachTargets func.
+func genReachTargets(fn DocumentFetcher) func([]target.Target, []*tag.Tag) ([]string, error) {
 	if fn == nil {
 		fn = goquery.NewDocument
 	}
-
-	var output []string
-	for _, t := range ts {
-		resp, err := fn(t.String())
-		if err != nil {
-			return []string{}, err
+	return func(ts []target.Target, tags []*tag.Tag) ([]string, error) {
+		var output []string
+		for _, t := range ts {
+			resp, err := fn(t.String())
+			if err != nil {
+				return []string{}, err
+			}
+			for _, tag := range tags {
+				output = append(output, dropEmpties(SelectMap(resp, TagSelectorMapper{Tag: tag}))...)
+			}
 		}
-		for _, tag := range tags {
-			output = append(output, dropEmpties(SelectMap(resp, TagSelectorMapper{Tag: tag}))...)
-		}
+		return output, nil
 	}
-	return output, nil
 }
+
+var (
+	// ReachTargets takes a list of targets, a list of tags, and a fetcher, fetches the targets with the
+	// fetcher, and finds the tags in the document.
+	ReachTargets = genReachTargets(nil)
+)
 
 // dropEmpties eliminates empty values from a list of strings.
 func dropEmpties(list []string) []string {

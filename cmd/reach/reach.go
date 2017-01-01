@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	errOneURL    = errors.New("please supply at least one URL")
+	errOneURL = errors.New("please supply at least one URL")
 )
 
 func main() {
@@ -41,7 +41,7 @@ func main() {
 	targets, err := target.ParseAll(flag.Args())
 	exitErr(err)
 
-	output, err := reacher.ReachTargets(targets, tags, nil)
+	output, err := reacher.ReachTargets(targets, tags)
 	exitErr(err)
 
 	fmt.Print(strings.Join(output, "\n"))

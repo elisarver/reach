@@ -82,10 +82,13 @@ func TestReachTargets(t *testing.T) {
 		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a><img src='/logo.png'/></body></html>")
 		return goquery.NewDocumentFromReader(r)
 	}
+	// use the internal generator to separate defaults from
+	// runtime version
+	rf := genReachTargets(reachFnSuccess)
 	u, _ := target.NewTarget("http://foo.bar/")
 	us := []target.Target{u}
 	tags := []*tag.Tag{tag.FromSpec("a"), tag.FromSpec("img")}
-	actual, err := ReachTargets(us, tags, reachFnSuccess)
+	actual, err := rf(us, tags)
 	if err != nil {
 		t.Errorf("test didn't expect %s", err)
 	}
