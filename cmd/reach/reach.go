@@ -14,7 +14,6 @@ import (
 
 var (
 	errOneURL    = errors.New("please supply at least one URL")
-	errEmptyTags = errors.New("empty tag arguments")
 )
 
 func main() {

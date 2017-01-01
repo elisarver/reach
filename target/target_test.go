@@ -66,11 +66,11 @@ func reportOn(reporter testhelp.Reporter, fn Targeter, expected interface{}) {
 type InputMultiExpected map[string]interface{}
 
 func TestParseAll(t *testing.T) {
-	result, err := ParseAll([]string{})
+	_, err := ParseAll([]string{})
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
-	result, err = ParseAll([]string{"http://google.com/"})
+	result, err := ParseAll([]string{"http://google.com/"})
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
