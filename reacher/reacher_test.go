@@ -1,7 +1,6 @@
 package reacher
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -51,7 +50,7 @@ func TestTagMapper(t *testing.T) {
 }
 
 func TestSelectMap(t *testing.T) {
-	doc := genDoc(t, "<a href='http://www.example.com/'/><link href=''/><dontcare/>")
+	doc := genDoc(t, "<a href='http://www.example.com/'/><a href=''/><link href=''/><dontcare/>")
 	fm := TagSelectorMapper{tag.FromSpec("a")}
 	exp := []string{"http://www.example.com/"}
 	act := SelectMap(doc, fm)
@@ -76,7 +75,6 @@ func genDoc(t *testing.T, s string) *goquery.Document {
 	return res
 }
 
-// reachTargets(ts []Target, tagName string, reachFn func(string) (*goquery.Document, error)) []string {
 func TestReachTargets(t *testing.T) {
 	reachFnSuccess := func(_ string) (*goquery.Document, error) {
 		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a><img src='/logo.png'/></body></html>")
@@ -84,7 +82,7 @@ func TestReachTargets(t *testing.T) {
 	}
 	// use the internal generator to separate defaults from
 	// runtime version
-	rf := genReachTargets(reachFnSuccess)
+	rf := GenReachTargets(reachFnSuccess)
 	u, _ := target.NewTarget("http://foo.bar/")
 	us := []target.Target{u}
 	tags := []*tag.Tag{tag.FromSpec("a"), tag.FromSpec("img")}
@@ -95,15 +93,5 @@ func TestReachTargets(t *testing.T) {
 	expected := []string{"http://foo.bar/", "/logo.png"}
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("expected %v, got %v", expected, actual)
-	}
-}
-
-func TestDropEmpties(t *testing.T) {
-	input := []string{"not empty", "", "also not empty"}
-	expected := fmt.Sprintf("%q", []string{"not empty", "also not empty"})
-	actual := fmt.Sprintf("%q", dropEmpties(input))
-	if expected != actual {
-		t.Errorf("dropEmpties failed!\nExpected:\n\t%s\nGot:\n\t%s\n",
-			expected, actual)
 	}
 }

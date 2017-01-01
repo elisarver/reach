@@ -2,6 +2,7 @@ package reacher
 
 import (
 	"github.com/PuerkitoBio/goquery"
+	"github.com/elisarver/reach/lists"
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
 )
@@ -23,9 +24,9 @@ type SelectorMapper interface {
 	Mapper
 }
 
-// SelectMap selects elements and maps them to response.
+// SelectMap selects elements and maps them to response. Drops empty values.
 func SelectMap(doc *goquery.Document, fm SelectorMapper) []string {
-	return doc.Find(fm.Select()).Map(fm.Map())
+	return lists.DropEmpties(doc.Find(fm.Select()).Map(fm.Map()))
 }
 
 // TagSelectorMapper applies SelectorMapper to Tag
@@ -49,9 +50,12 @@ func (tr TagSelectorMapper) Map() func(int, *goquery.Selection) string {
 // DocumentFetcher exists to make testing possible without resorting to hardcoded function.
 type DocumentFetcher func(string) (*goquery.Document, error)
 
-// genReachTargets binds the appropriate function to generate a document
+// TargetReacher is any function that fetches tags on targets.
+type TargetReacher func([]target.Target, []*tag.Tag) ([]string, error)
+
+// GenReachTargets binds the appropriate function to generate a document
 // to the ReachTargets func.
-func genReachTargets(fn DocumentFetcher) func([]target.Target, []*tag.Tag) ([]string, error) {
+func GenReachTargets(fn DocumentFetcher) TargetReacher {
 	if fn == nil {
 		fn = goquery.NewDocument
 	}
@@ -63,7 +67,7 @@ func genReachTargets(fn DocumentFetcher) func([]target.Target, []*tag.Tag) ([]st
 				return []string{}, err
 			}
 			for _, tag := range tags {
-				output = append(output, dropEmpties(SelectMap(resp, TagSelectorMapper{Tag: tag}))...)
+				output = append(output, SelectMap(resp, TagSelectorMapper{Tag: tag})...)
 			}
 		}
 		return output, nil
@@ -73,16 +77,5 @@ func genReachTargets(fn DocumentFetcher) func([]target.Target, []*tag.Tag) ([]st
 var (
 	// ReachTargets takes a list of targets, a list of tags, and a fetcher, fetches the targets with the
 	// fetcher, and finds the tags in the document.
-	ReachTargets = genReachTargets(nil)
+	ReachTargets = GenReachTargets(nil)
 )
-
-// dropEmpties eliminates empty values from a list of strings.
-func dropEmpties(list []string) []string {
-	newList := make([]string, 0, len(list))
-	for i := range list {
-		if list[i] != "" {
-			newList = append(newList, list[i])
-		}
-	}
-	return newList
-}
