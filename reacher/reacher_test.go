@@ -82,7 +82,7 @@ func TestReachTargets(t *testing.T) {
 	}
 	// use the internal generator to separate defaults from
 	// runtime version
-	rf := GenReachTargets(reachFnSuccess)
+	rf := genReachTargets(reachFnSuccess)
 	u, _ := target.NewTarget("http://foo.bar/")
 	us := []target.Target{u}
 	tags := []*tag.Tag{tag.FromSpec("a"), tag.FromSpec("img")}

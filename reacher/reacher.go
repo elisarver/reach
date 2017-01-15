@@ -47,15 +47,15 @@ func (tr TagSelectorMapper) Map() func(int, *goquery.Selection) string {
 	}
 }
 
-// DocumentFetcher exists to make testing possible without resorting to hardcoded function.
-type DocumentFetcher func(string) (*goquery.Document, error)
+// documentFn exists to make testing possible without resorting to hardcoded function.
+type documentFn func(string) (*goquery.Document, error)
 
 // TargetReacher is any function that fetches tags on targets.
 type TargetReacher func([]target.Target, []*tag.Tag) ([]string, error)
 
-// GenReachTargets binds the appropriate function to generate a document
+// genReachTargets binds the appropriate function to generate a document
 // to the ReachTargets func.
-func GenReachTargets(fn DocumentFetcher) TargetReacher {
+func genReachTargets(fn documentFn) TargetReacher {
 	if fn == nil {
 		fn = goquery.NewDocument
 	}
@@ -66,8 +66,8 @@ func GenReachTargets(fn DocumentFetcher) TargetReacher {
 			if err != nil {
 				return []string{}, err
 			}
-			for _, tag := range tags {
-				output = append(output, SelectMap(resp, TagSelectorMapper{Tag: tag})...)
+			for _, t := range tags {
+				output = append(output, SelectMap(resp, TagSelectorMapper{Tag: t})...)
 			}
 		}
 		return output, nil
@@ -77,5 +77,5 @@ func GenReachTargets(fn DocumentFetcher) TargetReacher {
 var (
 	// ReachTargets takes a list of targets, a list of tags, and a fetcher, fetches the targets with the
 	// fetcher, and finds the tags in the document.
-	ReachTargets = GenReachTargets(nil)
+	ReachTargets = genReachTargets(nil)
 )
