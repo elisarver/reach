@@ -1,62 +1,64 @@
 package tag
 
-import "fmt"
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
-// Tag represents an html tag
-type Tag struct {
+// Description represents an html tag's attributes
+type Description struct {
 	Name,
 	Attribute,
 	CSSSelector string
 }
 
 // New creates a tag with css selector
-func New(name, attr string) *Tag {
-	var selector string
+func New(name, attr string) *Description {
+	var s string
 	if name != "" && attr != "" {
-		selector = fmt.Sprintf("%s[%s]", name, attr)
+		s = fmt.Sprintf("%s[%s]", name, attr)
 	}
-	return &Tag{
+	return &Description{
 		Name:        name,
 		Attribute:   attr,
-		CSSSelector: selector,
+		CSSSelector: s,
 	}
 }
 
 // FromMultiSpec takes multiple comma-separated tag specs and turns them into a slice of tags
-func FromMultiSpec(multiTagSpec string) []*Tag {
-	specs := strings.Split(multiTagSpec, ",")
-	tags := make([]*Tag, 0, len(specs))
-	for _, spec := range specs {
-		tag := FromSpec(spec)
-		tags = append(tags, tag)
+func FromMultiSpec(multiTagSpec string) []*Description {
+	ss := strings.Split(multiTagSpec, ",")
+	ds := make([]*Description, 0, len(ss))
+	for _, s := range ss {
+		d := FromSpec(s)
+		ds = append(ds, d)
 	}
-	return tags
+	return ds
 }
 
 // FromSpec creates a new tag with the appropriate attributes built-in.
-func FromSpec(tagSpec string) *Tag {
-	name, attr := NameAttribute(tagSpec)
-	if attr == "" && name != "" {
-		attr = DefaultAttribute(name)
+func FromSpec(tagSpec string) *Description {
+	n, a := nameAttribute(tagSpec)
+	if a == "" && n != "" {
+		a = defaultAttribute(n)
 	}
-	return New(name, attr)
+	return New(n, a)
 }
 
-// NameAttribute splits a tagSpec into its name and attribute
-func NameAttribute(tagSpec string) (name, attribute string) {
-	spec := strings.Split(tagSpec, ":")
-	if len(spec) > 0 && spec[0] != "" {
-		name = spec[0]
+// nameAttribute splits a tagSpec into its name and attribute
+func nameAttribute(tagSpec string) (name, attribute string) {
+	s := strings.Split(tagSpec, ":")
+	if len(s) > 0 && s[0] != "" {
+		name = s[0]
 	}
-	if len(spec) > 1 && spec[1] != "" {
-		attribute = spec[1]
+	if len(s) > 1 && s[1] != "" {
+		attribute = s[1]
 	}
 	return name, attribute
 }
 
-// DefaultAttribute provides the default link attribute for a given tag name
-func DefaultAttribute(name string) (attribute string) {
+// defaultAttribute provides the default link attribute for a given tag name
+func defaultAttribute(name string) (attribute string) {
 	switch name {
 	default:
 		attribute = "src"

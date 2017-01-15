@@ -12,8 +12,7 @@ type Selector interface {
 	Select() string
 }
 
-// Mapper generates an approprirate goquery map
-// function to retrieve a tag's attribute.
+// Mapper generates an approprirate goquery map function to retrieve a tag's attribute.
 type Mapper interface {
 	Map() func(int, *goquery.Selection) string
 }
@@ -29,20 +28,20 @@ func SelectMap(doc *goquery.Document, fm SelectorMapper) []string {
 	return lists.DropEmpties(doc.Find(fm.Select()).Map(fm.Map()))
 }
 
-// TagSelectorMapper applies SelectorMapper to Tag
+// TagSelectorMapper applies SelectorMapper to Description
 type TagSelectorMapper struct {
-	*tag.Tag
+	*tag.Description
 }
 
 // Select returns a tag's CSS select string.
-func (tr TagSelectorMapper) Select() string {
-	return tr.CSSSelector
+func (tsm TagSelectorMapper) Select() string {
+	return tsm.CSSSelector
 }
 
 // Map provides the selection function for a goquery.Map.
-func (tr TagSelectorMapper) Map() func(int, *goquery.Selection) string {
+func (tsm TagSelectorMapper) Map() func(int, *goquery.Selection) string {
 	return func(_ int, sel *goquery.Selection) string {
-		s, _ := sel.Attr(tr.Attribute)
+		s, _ := sel.Attr(tsm.Attribute)
 		return s
 	}
 }
@@ -51,7 +50,7 @@ func (tr TagSelectorMapper) Map() func(int, *goquery.Selection) string {
 type documentFn func(string) (*goquery.Document, error)
 
 // TargetReacher is any function that fetches tags on targets.
-type TargetReacher func([]target.Target, []*tag.Tag) ([]string, error)
+type TargetReacher func([]target.Target, []*tag.Description) ([]string, error)
 
 // genReachTargets binds the appropriate function to generate a document
 // to the ReachTargets func.
@@ -59,7 +58,7 @@ func genReachTargets(fn documentFn) TargetReacher {
 	if fn == nil {
 		fn = goquery.NewDocument
 	}
-	return func(ts []target.Target, tags []*tag.Tag) ([]string, error) {
+	return func(ts []target.Target, tags []*tag.Description) ([]string, error) {
 		var output []string
 		for _, t := range ts {
 			resp, err := fn(t.String())
@@ -67,7 +66,7 @@ func genReachTargets(fn documentFn) TargetReacher {
 				return []string{}, err
 			}
 			for _, t := range tags {
-				output = append(output, SelectMap(resp, TagSelectorMapper{Tag: t})...)
+				output = append(output, SelectMap(resp, TagSelectorMapper{Description: t})...)
 			}
 		}
 		return output, nil
