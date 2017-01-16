@@ -19,10 +19,10 @@ func Errmsg(t *testing.T, instance string) Reporter {
 }
 
 // NewURL creates a new url, and fails the test if it's invalid.
-func NewURL(t *testing.T, u string) *url.URL {
-	url, err := url.Parse(u)
+func NewURL(t *testing.T, textURL string) *url.URL {
+	u, err := url.Parse(textURL)
 	if err != nil {
 		t.Error(err)
 	}
-	return url
+	return u
 }
