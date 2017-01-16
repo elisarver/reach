@@ -3,8 +3,6 @@ package tag
 import (
 	"testing"
 
-	"reflect"
-
 	"github.com/elisarver/reach/testhelp"
 )
 
@@ -23,11 +21,9 @@ func TestFromMultiSpec(t *testing.T) {
 			{Name: "meta", Attribute: "name", CSSSelector: "meta[name]"}}},
 	}
 	for instance, test := range tests {
-		reporter := testhelp.Errmsg(t, instance)
+		r := testhelp.Reporter(t, instance)
 		actual := FromMultiSpec(test.name)
-		if !reflect.DeepEqual(test.expected, actual) {
-			reporter("expected %q, got %q", test.expected, actual)
-		}
+		r.Compare(test.expected, actual)
 	}
 }
 

@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"net/url"
+	"reflect"
 	"strings"
 	"testing"
 )
 
-// Reporter is this package's name for the standard Formatter.
-type Reporter func(message string, values ...interface{})
+type R struct {
+	t        *testing.T
+	instance string
+}
 
-// Errmsg returns a function that works like fmt.Errorf, but logs the test information
-// and runs it through t's Errorf.
-func Errmsg(t *testing.T, instance string) Reporter {
-	return func(message string, values ...interface{}) {
-		t.Errorf(fmt.Sprintf("%s: %s", instance, message), values...)
-	}
+// Reporter returns an R that reports on a test instance in its logging.
+func Reporter(t *testing.T, instance string) *R {
+	return &R{t: t, instance: instance}
 }
 
 // NewURL creates a new url, and fails the test if it's invalid.
@@ -39,4 +39,14 @@ func GenDoc(t *testing.T, s string) *goquery.Document {
 		t.Error(err)
 	}
 	return res
+}
+
+func (r *R) Errorf(format string, values ...interface{}) {
+	r.t.Errorf("%s:%s", r.instance, fmt.Sprintf(format, values...))
+}
+
+func (r *R) Compare(expected, actual interface{}) {
+	if !reflect.DeepEqual(expected, actual) {
+		r.Errorf("Expected:\n\t%s\nGot:\n\t%s\n", expected, actual)
+	}
 }
