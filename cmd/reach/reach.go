@@ -12,9 +12,8 @@ import (
 	"github.com/elisarver/reach/target"
 )
 
-var (
-	errOneURL = errors.New("please supply at least one URL")
-)
+var errOneURL = errors.New("please supply at least one URL")
+
 
 func main() {
 	var pTag string

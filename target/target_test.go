@@ -22,8 +22,8 @@ func TestNewTarget(t *testing.T) {
 	}
 	for instance, test := range tests {
 		reporter := testhelp.Errmsg(t, instance)
-		fn := func() (Target, error) {
-			return NewTarget(test.input.(string))
+		fn := func() (Location, error) {
+			return New(test.input.(string))
 		}
 		reportOn(reporter, fn, test.expected)
 	}
@@ -36,15 +36,15 @@ func TestParse(t *testing.T) {
 	}
 	for instance, test := range tests {
 		reporter := testhelp.Errmsg(t, instance)
-		tgt := &Target{URL: u}
-		fn := func() (Target, error) {
+		tgt := &Location{URL: u}
+		fn := func() (Location, error) {
 			return tgt.Parse(test.input.(string))
 		}
 		reportOn(reporter, fn, test.expected)
 	}
 }
 
-func reportOn(reporter testhelp.Reporter, fn func() (Target, error), expected interface{}) {
+func reportOn(reporter testhelp.Reporter, fn func() (Location, error), expected interface{}) {
 	tgt, err := fn()
 	var actual interface{}
 	if err != nil {
@@ -66,7 +66,7 @@ func TestParseAll(t *testing.T) {
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
-	expected := []Target{{testhelp.NewURL(t, "http://google.com/")}}
+	expected := []Location{{testhelp.NewURL(t, "http://google.com/")}}
 	if !reflect.DeepEqual(result, expected) {
 		t.Errorf("results don't match. expected %v, got %v", expected, result)
 	}

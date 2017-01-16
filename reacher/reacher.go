@@ -50,7 +50,7 @@ func (tsm TagSelectorMapper) Map() func(int, *goquery.Selection) string {
 type documentFn func(string) (*goquery.Document, error)
 
 // TargetReacher is any function that fetches tags on targets.
-type TargetReacher func([]target.Target, []*tag.Description) ([]string, error)
+type TargetReacher func([]target.Location, []*tag.Description) ([]string, error)
 
 // genReachTargets binds the appropriate function to generate a document
 // to the ReachTargets func.
@@ -58,7 +58,7 @@ func genReachTargets(fn documentFn) TargetReacher {
 	if fn == nil {
 		fn = goquery.NewDocument
 	}
-	return func(ts []target.Target, tags []*tag.Description) ([]string, error) {
+	return func(ts []target.Location, tags []*tag.Description) ([]string, error) {
 		var output []string
 		for _, t := range ts {
 			resp, err := fn(t.String())

@@ -4,40 +4,40 @@ import (
 	"net/url"
 )
 
-// Target represents a validated url.
-type Target struct {
+// Location represents a validated url.
+type Location struct {
 	*url.URL
 }
 
-var baseTarget = &Target{&url.URL{}}
+var baseTarget = &Location{&url.URL{}}
 
-// NewTarget makes a Target from a raw url string.
-func NewTarget(textURL string) (Target, error) {
+// New makes a Location from a raw url string.
+func New(textURL string) (Location, error) {
 	return baseTarget.Parse(textURL)
 }
 
-// Parse makes a Target from a reference Target.
-func (t Target) Parse(textURL string) (Target, error) {
+// Parse makes a Location from a reference Location.
+func (t Location) Parse(textURL string) (Location, error) {
 	u, err := t.URL.Parse(textURL)
 	if err != nil {
-		return Target{}, err
+		return Location{}, err
 	}
-	return Target{u}, nil
+	return Location{u}, nil
 }
 
-// ParseAll without creating a Target
-func ParseAll(args []string) ([]Target, error) {
+// ParseAll without creating a Location
+func ParseAll(args []string) ([]Location, error) {
 	return baseTarget.ParseAll(args)
 }
 
 // ParseAll converts arguments into a list of URLs.
-func (t Target) ParseAll(args []string) ([]Target, error) {
-	ts := make([]Target, 0, len(args))
+func (t Location) ParseAll(args []string) ([]Location, error) {
+	ts := make([]Location, 0, len(args))
 	for i := range args {
 		if targ, err := t.Parse(args[i]); err == nil {
 			ts = append(ts, targ)
 		} else {
-			return []Target{}, err
+			return []Location{}, err
 		}
 	}
 	return ts, nil
