@@ -9,20 +9,16 @@ type Target struct {
 	*url.URL
 }
 
-// NewTarget makes a Target from a raw url string.
-func NewTarget(rawurl string) (Target, error) {
-	var t = &Target{&url.URL{}}
-	return t.Parse(rawurl)
-}
+var baseTarget = &Target{&url.URL{}}
 
-// Parse without creating a Target.
-func Parse(rawurl string) (Target, error) {
-	return Target{&url.URL{}}.Parse(rawurl)
+// NewTarget makes a Target from a raw url string.
+func NewTarget(textURL string) (Target, error) {
+	return baseTarget.Parse(textURL)
 }
 
 // Parse makes a Target from a reference Target.
-func (t Target) Parse(rawurl string) (Target, error) {
-	u, err := t.URL.Parse(rawurl)
+func (t Target) Parse(textURL string) (Target, error) {
+	u, err := t.URL.Parse(textURL)
 	if err != nil {
 		return Target{}, err
 	}
@@ -31,7 +27,7 @@ func (t Target) Parse(rawurl string) (Target, error) {
 
 // ParseAll without creating a Target
 func ParseAll(args []string) ([]Target, error) {
-	return Target{&url.URL{}}.ParseAll(args)
+	return baseTarget.ParseAll(args)
 }
 
 // ParseAll converts arguments into a list of URLs.

@@ -36,34 +36,26 @@ func TestParse(t *testing.T) {
 	}
 	for instance, test := range tests {
 		reporter := testhelp.Errmsg(t, instance)
-		t := &Target{URL: u}
+		tgt := &Target{URL: u}
 		fn := func() (Target, error) {
-			return t.Parse(test.input.(string))
+			return tgt.Parse(test.input.(string))
 		}
 		reportOn(reporter, fn, test.expected)
 	}
 }
 
-type Stringer interface {
-	String() string
-}
-
-type Targeter func() (Target, error)
-
-func reportOn(reporter testhelp.Reporter, fn Targeter, expected interface{}) {
-	target, err := fn()
+func reportOn(reporter testhelp.Reporter, fn func() (Target, error), expected interface{}) {
+	tgt, err := fn()
 	var actual interface{}
 	if err != nil {
 		actual = err.Error()
 	} else {
-		actual = target.String()
+		actual = tgt.String()
 	}
 	if actual != expected {
 		reporter("expeced %q, got %q", expected, actual)
 	}
 }
-
-type InputMultiExpected map[string]interface{}
 
 func TestParseAll(t *testing.T) {
 	_, err := ParseAll([]string{})
