@@ -14,7 +14,6 @@ import (
 
 var errOneURL = errors.New("please supply at least one URL")
 
-
 func main() {
 	var pTag string
 	flag.StringVar(&pTag, "tag", "a", "comma-separated list of `tags` to search for.\n\tformat: name1[:attribute1][,name2[:attribute2]]")

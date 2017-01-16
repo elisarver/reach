@@ -3,7 +3,9 @@ package testhelp
 
 import (
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -25,4 +27,16 @@ func NewURL(t *testing.T, textURL string) *url.URL {
 		t.Error(err)
 	}
 	return u
+}
+
+// GenDoc generates a goquery.Document from a raw HTML string.
+func GenDoc(t *testing.T, s string) *goquery.Document {
+	var (
+		res *goquery.Document
+		err error
+	)
+	if res, err = goquery.NewDocumentFromReader(strings.NewReader(s)); err != nil {
+		t.Error(err)
+	}
+	return res
 }

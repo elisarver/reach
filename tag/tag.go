@@ -2,18 +2,53 @@ package tag
 
 import (
 	"fmt"
-	"strings"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/elisarver/reach/lists"
+	"strings"
 )
 
-// Description represents an html tag's attributes
+// Selector provides a statement goquery can use in a Find call.
+type Selector interface {
+	Select() string
+}
+
+// Mapper generates an approprirate goquery map function to retrieve a tag's attribute.
+type Mapper interface {
+	Map() func(int, *goquery.Selection) string
+}
+
+// SelectorMapper is the intersection of something that can select results and map them over functions.
+type SelectorMapper interface {
+	Selector
+	Mapper
+}
+
+// Description represents an html tag's attributes. Satisfies SelectorMapper
 type Description struct {
 	Name,
 	Attribute,
 	CSSSelector string
 }
 
-// New creates a tag with css selector
+// Select returns a tag's CSS select string.
+func (d Description) Select() string {
+	return d.CSSSelector
+}
+
+// Map provides the selection function for a goquery.Map.
+func (d Description) Map() func(int, *goquery.Selection) string {
+	return func(_ int, sel *goquery.Selection) string {
+		s, _ := sel.Attr(d.Attribute)
+		return s
+	}
+}
+
+// SelectMap selects elements and maps them to response. Drops empty values.
+func SelectMap(doc *goquery.Document, sm SelectorMapper) []string {
+	return lists.DropEmpties(doc.Find(sm.Select()).Map(sm.Map()))
+}
+
+// New creates a tag.Description with css selector
 func New(name, attr string) *Description {
 	var s string
 	if name != "" && attr != "" {
@@ -44,20 +79,6 @@ func FromSpec(tagSpec string) *Description {
 		a = defaultAttribute(n)
 	}
 	return New(n, a)
-}
-
-
-// Select returns a tag's CSS select string.
-func (d Description) Select() string {
-	return d.CSSSelector
-}
-
-// Map provides the selection function for a goquery.Map.
-func (d Description) Map() func(int, *goquery.Selection) string {
-	return func(_ int, sel *goquery.Selection) string {
-		s, _ := sel.Attr(d.Attribute)
-		return s
-	}
 }
 
 // nameAttribute splits a tagSpec into its name and attribute
