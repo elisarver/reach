@@ -28,24 +28,6 @@ func SelectMap(doc *goquery.Document, fm SelectorMapper) []string {
 	return lists.DropEmpties(doc.Find(fm.Select()).Map(fm.Map()))
 }
 
-// TagSelectorMapper applies SelectorMapper to Description
-type TagSelectorMapper struct {
-	*tag.Description
-}
-
-// Select returns a tag's CSS select string.
-func (tsm TagSelectorMapper) Select() string {
-	return tsm.CSSSelector
-}
-
-// Map provides the selection function for a goquery.Map.
-func (tsm TagSelectorMapper) Map() func(int, *goquery.Selection) string {
-	return func(_ int, sel *goquery.Selection) string {
-		s, _ := sel.Attr(tsm.Attribute)
-		return s
-	}
-}
-
 // documentFn exists to make testing possible without resorting to hardcoded function.
 type documentFn func(string) (*goquery.Document, error)
 
@@ -58,15 +40,15 @@ func genReachTargets(fn documentFn) TargetReacher {
 	if fn == nil {
 		fn = goquery.NewDocument
 	}
-	return func(ts []target.Location, tags []*tag.Description) ([]string, error) {
+	return func(ls []target.Location, ds []*tag.Description) ([]string, error) {
 		var output []string
-		for _, t := range ts {
-			resp, err := fn(t.String())
+		for _, l := range ls {
+			resp, err := fn(l.String())
 			if err != nil {
 				return []string{}, err
 			}
-			for _, t := range tags {
-				output = append(output, SelectMap(resp, TagSelectorMapper{Description: t})...)
+			for _, d := range ds {
+				output = append(output, SelectMap(resp, d)...)
 			}
 		}
 		return output, nil

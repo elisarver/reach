@@ -3,6 +3,7 @@ package tag
 import (
 	"fmt"
 	"strings"
+	"github.com/PuerkitoBio/goquery"
 )
 
 // Description represents an html tag's attributes
@@ -43,6 +44,20 @@ func FromSpec(tagSpec string) *Description {
 		a = defaultAttribute(n)
 	}
 	return New(n, a)
+}
+
+
+// Select returns a tag's CSS select string.
+func (d Description) Select() string {
+	return d.CSSSelector
+}
+
+// Map provides the selection function for a goquery.Map.
+func (d Description) Map() func(int, *goquery.Selection) string {
+	return func(_ int, sel *goquery.Selection) string {
+		s, _ := sel.Attr(d.Attribute)
+		return s
+	}
 }
 
 // nameAttribute splits a tagSpec into its name and attribute
