@@ -1,4 +1,4 @@
-package lists
+package collections
 
 // DropEmpties eliminates empty values from a list of strings.
 func DropEmpties(list []string) []string {

@@ -3,7 +3,7 @@ package tag
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/elisarver/reach/lists"
+	"github.com/elisarver/reach/collections"
 	"strings"
 )
 
@@ -45,7 +45,7 @@ func (d Description) Map() func(int, *goquery.Selection) string {
 
 // SelectMap selects elements and maps them to response. Drops empty values.
 func SelectMap(doc *goquery.Document, sm SelectorMapper) []string {
-	return lists.DropEmpties(doc.Find(sm.Select()).Map(sm.Map()))
+	return collections.DropEmpties(doc.Find(sm.Select()).Map(sm.Map()))
 }
 
 // New creates a tag.Description with css selector
