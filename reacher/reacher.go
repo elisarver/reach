@@ -3,6 +3,7 @@ package reacher
 import (
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
+	"github.com/elisarver/reach/collections"
 )
 
 type config struct {
@@ -15,6 +16,9 @@ var Config = config{
 	// URL parts filling in missing values.
 	Reparent: false,
 }
+
+// URLAttrs represents all attributes that have a URL-like as a value.
+var URLAttrs = collections.Set{"href": nil, "link": nil, "src": nil}
 
 func ReachTargets(ls []target.Location, ds []*tag.Description) ([]string, error) {
 	var output []string

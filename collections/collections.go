@@ -10,3 +10,11 @@ func DropEmpties(list []string) []string {
 	}
 	return newList
 }
+
+// Set is a map that has a membership concept.
+type Set map[string]interface{}
+
+func (a Set) Contains(attr string) bool {
+	_, ok := a[attr]
+	return ok
+}
