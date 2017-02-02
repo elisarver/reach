@@ -19,6 +19,8 @@ func main() {
 	flag.StringVar(&pTag, "tag", "a", "comma-separated list of `tags` to search for.\n\tformat: name1[:attribute1][,name2[:attribute2]]")
 	var help bool
 	flag.BoolVar(&help, "h", false, "print help")
+
+	flag.BoolVar(&reacher.Config.Reparent, "p", false, "reparent relative URIs to request domain")
 	flag.Parse()
 
 	if help {
