@@ -22,7 +22,7 @@ func TestNewTarget(t *testing.T) {
 	for instance, test := range tests {
 		reporter := testhelp.Reporter(t, instance)
 		fn := func() (Location, error) {
-			return New(test.input.(string))
+			return NewLocation(test.input.(string))
 		}
 		reportOn(reporter, fn, test.expected)
 	}
@@ -55,11 +55,11 @@ func reportOn(r *testhelp.R, fn func() (Location, error), expected interface{}) 
 }
 
 func TestParseAll(t *testing.T) {
-	_, err := ParseAll([]string{})
+	_, err := ParseLocations([]string{}...)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
-	result, err := ParseAll([]string{"http://google.com/", "http://google.com/", "http://example.com/"})
+	result, err := ParseLocations("http://google.com/", "http://google.com/", "http://example.com/")
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}

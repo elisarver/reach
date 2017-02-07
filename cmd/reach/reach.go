@@ -38,7 +38,7 @@ func main() {
 		exitErr(errOneURL)
 	}
 
-	targets, err := target.ParseAll(flag.Args())
+	targets, err := target.ParseLocations(flag.Args()...)
 	exitErr(err)
 
 	output, err := reacher.ReachTargets(targets, tags)

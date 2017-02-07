@@ -20,7 +20,7 @@ func TestReachTargets(t *testing.T) {
 	// use the internal generator to separate defaults from
 	// runtime version
 	target.Config.Retrieve = target.GenRetrieve(reachFnSuccess)
-	l, _ := target.New("http://foo.bar/")
+	l, _ := target.NewLocation("http://foo.bar/")
 	ls := []target.Location{l}
 	ds := []*tag.Description{tag.FromSpec("a"), tag.FromSpec("img")}
 	actual, err := ReachTargets(ls, ds)

@@ -26,7 +26,7 @@ var URLAttrs = collections.Set{"href": nil, "link": nil, "src": nil}
 // in an attempt to extract values out of them. If the global Reparent config option
 // is set, It also applies the URL re-parenting of relative paths to the values,
 // generating more canonical site-oriented urls.
-func ReachTargets(ls []target.Location, ds []*tag.Description) ([]string, error) {
+func ReachTargets(ls target.LocationSlice, ds []*tag.Description) ([]string, error) {
 	reparentItem := func(s *string, fn func(string) (target.Location, error)) {
 		if strings.HasPrefix(*s, "javascript") {
 			return
