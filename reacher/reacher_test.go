@@ -22,7 +22,7 @@ func TestReachTargets(t *testing.T) {
 	target.Config.Retrieve = target.GenRetrieve(reachFnSuccess)
 	l, _ := target.NewLocation("http://foo.bar/")
 	ls := []target.Location{l}
-	ds := []*tag.Description{tag.FromSpec("a"), tag.FromSpec("img")}
+	ds := tag.NewDescriptionSet(tag.DescriptionFromSpec("a"), tag.DescriptionFromSpec("img"))
 	actual, err := ReachTargets(ls, ds)
 	if err != nil {
 		t.Errorf("test didn't expect %s", err)

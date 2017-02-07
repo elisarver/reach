@@ -32,7 +32,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	tags := tag.FromMultiSpec(pTag)
+	tags := tag.DescriptionSetFromMultiSpec(pTag)
 
 	if len(flag.Args()) == 0 {
 		exitErr(errOneURL)
