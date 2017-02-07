@@ -1,12 +1,11 @@
 package reacher
 
 import (
+	"strings"
+
+	"github.com/elisarver/reach/collections"
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
-	"strings"
-	"fmt"
-	"os"
-	"github.com/elisarver/reach/collections"
 )
 
 type config struct {
@@ -23,28 +22,32 @@ var Config = config{
 // URLAttrs represents all attributes that have a URL-like as a value.
 var URLAttrs = collections.Set{"href": nil, "link": nil, "src": nil}
 
-func mp(values []string, fn func(string) (target.Location, error)) []string {
-	for i, v := range values {
-		if !strings.HasPrefix(v, "javascript") {
-			r, e := fn(v)
-			if e != nil {
-				fmt.Fprintf(os.Stderr, "junk value failed parse: %s", v)
-				continue
-			}
-			nv := r.URL.String()
-			if nv != v && nv != "" {
-				values[i] = nv
-			}
-		}
-	}
-	return values
-}
-
 // ReachTargets ranges over locations, and applies the descriptions to each document,
 // in an attempt to extract values out of them. If the global Reparent config option
 // is set, It also applies the URL re-parenting of relative paths to the values,
 // generating more canonical site-oriented urls.
 func ReachTargets(ls []target.Location, ds []*tag.Description) ([]string, error) {
+	reparentItem := func(s *string, fn func(string) (target.Location, error)) {
+		if strings.HasPrefix(*s, "javascript") {
+			return
+		}
+		if r, e := fn(*s); e == nil {
+			*s = r.URL.String()
+		} else {
+			return
+		}
+	}
+
+	reparentList := func(values *[]string, fn func(string) (target.Location, error)) {
+		for i := range *values {
+			if strings.HasPrefix((*values)[i], "http") {
+				continue
+			}
+			reparentItem(&(*values)[i], fn)
+		}
+		return
+	}
+
 	var output []string
 	for _, l := range ls {
 		resp, err := l.Retrieve()
@@ -54,7 +57,7 @@ func ReachTargets(ls []target.Location, ds []*tag.Description) ([]string, error)
 		for _, d := range ds {
 			var values = tag.SelectMap(resp, d)
 			if Config.Reparent && URLAttrs.Contains(d.Attribute) {
-				values = mp(values, l.Parse)
+				reparentList(&values, l.Parse)
 			}
 			output = append(output, values...)
 		}
