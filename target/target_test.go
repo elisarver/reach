@@ -59,11 +59,12 @@ func TestParseAll(t *testing.T) {
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
-	result, err := ParseAll([]string{"http://google.com/"})
+	result, err := ParseAll([]string{"http://google.com/", "http://google.com/", "http://example.com/"})
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
-	expected := []Location{{testhelp.NewURL(t, "http://google.com/")}}
+	expected := LocationSlice{{testhelp.NewURL(t, "http://google.com/")},
+		{testhelp.NewURL(t, "http://example.com/")}}
 	r := testhelp.Reporter(t, "parseAll")
 	r.Compare(expected, result)
 }
