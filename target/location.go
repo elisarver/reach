@@ -2,6 +2,7 @@ package target
 
 import (
 	"net/url"
+
 	"github.com/PuerkitoBio/goquery"
 )
 

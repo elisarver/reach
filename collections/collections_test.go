@@ -2,8 +2,9 @@ package collections
 
 import (
 	"fmt"
-	"github.com/elisarver/reach/testhelp"
 	"testing"
+
+	"github.com/elisarver/reach/testhelp"
 )
 
 func TestDropEmpties(t *testing.T) {

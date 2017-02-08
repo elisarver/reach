@@ -1,9 +1,10 @@
 package tag
 
 import (
-	"github.com/PuerkitoBio/goquery"
 	"fmt"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 // Description represents an html tag's attributes. Satisfies SelectorMapper
@@ -48,7 +49,6 @@ func NewDescription(name, attr string) Description {
 		CSSSelector: s,
 	}
 }
-
 
 // nameAttribute splits a tagSpec into its name and attribute
 func nameAttribute(tagSpec string) (name, attribute string) {

@@ -3,11 +3,12 @@ package testhelp
 
 import (
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"net/url"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 type R struct {
