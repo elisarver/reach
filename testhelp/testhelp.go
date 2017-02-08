@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"net/url"
 	"reflect"
-	"strings"
 	"testing"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
+// R is a reporting testing.T
 type R struct {
 	t        *testing.T
 	instance string
@@ -30,22 +28,12 @@ func NewURL(t *testing.T, textURL string) *url.URL {
 	return u
 }
 
-// GenDoc generates a goquery.Document from a raw HTML string.
-func GenDoc(t *testing.T, s string) *goquery.Document {
-	var (
-		res *goquery.Document
-		err error
-	)
-	if res, err = goquery.NewDocumentFromReader(strings.NewReader(s)); err != nil {
-		t.Error(err)
-	}
-	return res
-}
-
+// Errorf reports an error on a test to the enclosing R
 func (r *R) Errorf(format string, values ...interface{}) {
 	r.t.Errorf("%s:%s", r.instance, fmt.Sprintf(format, values...))
 }
 
+// Compare reports on differing values in a result to its enclosing R
 func (r *R) Compare(expected, actual interface{}) {
 	if !reflect.DeepEqual(expected, actual) {
 		r.Errorf("Expected:\n\t%s\nGot:\n\t%s\n", expected, actual)

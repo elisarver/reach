@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elisarver/reach/reacher"
+	"github.com/elisarver/reach/document"
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
 )
@@ -20,7 +20,7 @@ func main() {
 	var help bool
 	flag.BoolVar(&help, "h", false, "print help")
 
-	flag.BoolVar(&reacher.Config.Reparent, "p", false, "reparent relative URIs to request domain")
+	flag.BoolVar(&document.Config.Reparent, "p", false, "reparent relative URIs to request domain")
 	flag.Parse()
 
 	if help {
@@ -32,7 +32,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	tags := tag.DescriptionSetFromMultiSpec(pTag)
+	tags := tag.DescriptionSliceFromMultiSpec(pTag)
 
 	if len(flag.Args()) == 0 {
 		exitErr(errOneURL)
@@ -41,7 +41,7 @@ func main() {
 	targets, err := target.ParseLocations(flag.Args()...)
 	exitErr(err)
 
-	output, err := reacher.ReachTargets(targets, tags)
+	output, err := document.NewProcessor(targets, tags).ReachTargets()
 	exitErr(err)
 
 	fmt.Print(strings.Join(output, "\n"))

@@ -14,6 +14,7 @@ func DropEmpties(list []string) []string {
 // Set is a map that has a membership concept.
 type Set map[string]interface{}
 
+// Contains checks whether a set contains a member.
 func (a Set) Contains(attr string) bool {
 	_, ok := a[attr]
 	return ok

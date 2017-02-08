@@ -1,4 +1,4 @@
-package reacher
+package document
 
 import (
 	"reflect"
@@ -19,11 +19,12 @@ func TestReachTargets(t *testing.T) {
 	}
 	// use the internal generator to separate defaults from
 	// runtime version
-	target.Config.Retrieve = target.GenRetrieve(reachFnSuccess)
+	Config.Retrieve = genRetrieve(reachFnSuccess)
 	l, _ := target.NewLocation("http://foo.bar/")
-	ls := []target.Location{l}
-	ds := tag.NewDescriptionSet(tag.DescriptionFromSpec("a"), tag.DescriptionFromSpec("img"))
-	actual, err := ReachTargets(ls, ds)
+	ls := target.LocationSlice{l}
+	ds := tag.DescriptionSlice{tag.DescriptionFromSpec("a"), tag.DescriptionFromSpec("img")}
+	processor := NewProcessor(ls, ds)
+	actual, err := processor.ReachTargets()
 	if err != nil {
 		t.Errorf("test didn't expect %s", err)
 	}

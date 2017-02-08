@@ -3,12 +3,10 @@ package tag
 import (
 	"fmt"
 	"strings"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 // Description represents an html tag's attributes. Satisfies SelectorMapper
-// +gen set
+// +gen slice
 type Description struct {
 	Name,
 	Attribute,
@@ -18,14 +16,6 @@ type Description struct {
 // Select returns a tag's CSS select string.
 func (d Description) Select() string {
 	return d.CSSSelector
-}
-
-// Map provides the selection function for a goquery.Map.
-func (d Description) Map() func(int, *goquery.Selection) string {
-	return func(_ int, sel *goquery.Selection) string {
-		s, _ := sel.Attr(d.Attribute)
-		return s
-	}
 }
 
 // DescriptionFromSpec creates a new tag with the appropriate attributes built-in.

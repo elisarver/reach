@@ -3,7 +3,6 @@ package target
 import (
 	"net/url"
 
-	"github.com/PuerkitoBio/goquery"
 )
 
 // Location represents a validated url.
@@ -19,11 +18,6 @@ func NewLocation(textURL string) (Location, error) {
 	return emptyLocation.Parse(textURL)
 }
 
-// Retrieve calls the global document retriever on a location
-func (l Location) Retrieve() (*goquery.Document, error) {
-	return Config.Retrieve(l)
-}
-
 // Parse makes a Location from a reference Location.
 func (l Location) Parse(textURL string) (Location, error) {
 	u, err := l.URL.Parse(textURL)
@@ -33,12 +27,12 @@ func (l Location) Parse(textURL string) (Location, error) {
 	return Location{u}, nil
 }
 
-// ParseAll without creating a Location
+// ParseLocations without creating a Location
 func ParseLocations(args ...string) (LocationSlice, error) {
 	return emptyLocation.ParseLocations(args...)
 }
 
-// ParseAll converts arguments into a LocationSlice of distinct values
+// ParseLocations converts arguments into a LocationSlice of distinct values
 func (l Location) ParseLocations(args ...string) (LocationSlice, error) {
 	ls := make(LocationSlice, 0, len(args))
 	for i := range args {
