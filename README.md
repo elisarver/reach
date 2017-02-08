@@ -31,7 +31,7 @@ http://google.com/services/
 ````
 Specify tag type:
 ````
-reach -tag meta:name http://google.com/
+> reach -tag meta:name http://google.com/
 description
 robots
 ````
