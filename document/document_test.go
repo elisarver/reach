@@ -5,9 +5,11 @@ import (
 	"strings"
 	"testing"
 
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
+	"github.com/elisarver/reach/testhelp"
 )
 
 func TestReachTargets(t *testing.T) {
@@ -32,4 +34,12 @@ func TestReachTargets(t *testing.T) {
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("expected %v, got %v", expected, actual)
 	}
+}
+
+func TestDropEmpties(t *testing.T) {
+	input := []string{"not empty", "", "also not empty"}
+	expected := fmt.Sprintf("%q", []string{"not empty", "also not empty"})
+	actual := fmt.Sprintf("%q", DropEmpties(input))
+	r := testhelp.Reporter(t, "dropEmpties")
+	r.Compare(expected, actual)
 }

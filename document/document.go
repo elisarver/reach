@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/elisarver/reach/collections"
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
 )
@@ -50,9 +49,8 @@ func NewProcessor(loc target.LocationSlice, tags tag.DescriptionSlice) *Processo
 
 // selectMap selects elements and maps them to response. Drops empty values.
 func (p *Processor) selectMap(doc *goquery.Document, desc tag.Description) []string {
-	return collections.DropEmpties(doc.Find(desc.Select()).Map(p.mapGen(desc)))
+	return DropEmpties(doc.Find(desc.Select()).Map(p.mapGen(desc)))
 }
-
 
 //mapGen generates the mapping function necessary to process goquery selections
 func (p *Processor) mapGen(desc tag.Description) func(int, *goquery.Selection) string {
@@ -63,7 +61,7 @@ func (p *Processor) mapGen(desc tag.Description) func(int, *goquery.Selection) s
 }
 
 // URLAttrs represents all attributes that have a URL-like as a value.
-var URLAttrs = collections.Set{"href": nil, "link": nil, "src": nil}
+var URLAttrs = set{"href": nil, "link": nil, "src": nil}
 
 // ReachTargets ranges over locations, and applies the descriptions to each document,
 // in an attempt to extract values out of them. If the global Reparent config option
@@ -99,7 +97,7 @@ func (p *Processor) ReachTargets() ([]string, error) {
 		}
 		for _, t := range p.Tags {
 			var values = p.selectMap(d, t)
-			if Config.Reparent && URLAttrs.Contains(t.Attribute) {
+			if Config.Reparent && URLAttrs.contains(t.Attribute) {
 				reparentList(&values, l.Parse)
 			}
 
@@ -107,4 +105,24 @@ func (p *Processor) ReachTargets() ([]string, error) {
 		}
 	}
 	return output, nil
+}
+
+// DropEmpties eliminates empty values from a list of strings.
+func DropEmpties(list []string) []string {
+	newList := make([]string, 0, len(list))
+	for i := range list {
+		if list[i] != "" {
+			newList = append(newList, list[i])
+		}
+	}
+	return newList
+}
+
+// set is a map that has a membership concept.
+type set map[string]interface{}
+
+// contains checks whether a set contains a member.
+func (a set) contains(attr string) bool {
+	_, ok := a[attr]
+	return ok
 }
