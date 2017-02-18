@@ -14,6 +14,8 @@ import (
 
 func TestReachTargets(t *testing.T) {
 	Config.Reparent = true
+	defer func() { Config.Reparent = false }()
+
 	reachFnSuccess := func(_ string) (*goquery.Document, error) {
 		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a><img src='/logo.png'/></body></html>" +
 			"<img src='javascript:'/>")
@@ -31,6 +33,28 @@ func TestReachTargets(t *testing.T) {
 		t.Errorf("test didn't expect %s", err)
 	}
 	expected := []string{"http://foo.bar/", "http://foo.bar/logo.png", "javascript:"}
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("expected %v, got %v", expected, actual)
+	}
+}
+
+func TestRawQuery(t *testing.T) {
+	reachFnSuccess := func(_ string) (*goquery.Document, error) {
+		r := strings.NewReader("<html><body><p>body1</p><p>body2</p></body></html>")
+		return goquery.NewDocumentFromReader(r)
+	}
+	// use the internal generator to separate defaults from
+	// runtime version
+	Config.Retrieve = genRetrieve(reachFnSuccess)
+	l, _ := target.NewLocation("http://foo.bar/")
+	ls := target.LocationSlice{l}
+	ds := tag.RawQuery("body")
+	processor := NewProcessor(ls, ds)
+	actual, err := processor.ReachTargets()
+	if err != nil {
+		t.Errorf("test didn't expect %s", err)
+	}
+	expected := []string{"<p>body1</p><p>body2</p>"}
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("expected %v, got %v", expected, actual)
 	}

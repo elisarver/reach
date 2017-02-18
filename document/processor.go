@@ -8,7 +8,6 @@ import (
 	"github.com/elisarver/reach/target"
 )
 
-
 // Processor is a colletion of structs that are processed for values.
 type Processor struct {
 	Tags      tag.DescriptionSlice
@@ -30,7 +29,12 @@ func (p *Processor) selectMap(doc *goquery.Document, desc tag.Description) []str
 //mapGen generates the mapping function necessary to process goquery selections
 func (p *Processor) mapGen(desc tag.Description) func(int, *goquery.Selection) string {
 	return func(_ int, sel *goquery.Selection) string {
-		s, _ := sel.Attr(desc.Attribute)
+		var s string
+		if desc.Attribute != "" {
+			s, _ = sel.Attr(desc.Attribute)
+		} else {
+			s, _ = sel.Html()
+		}
 		return s
 	}
 }

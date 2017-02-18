@@ -17,10 +17,15 @@ var errOneURL = errors.New("please supply at least one URL")
 func main() {
 	var pTag string
 	flag.StringVar(&pTag, "tag", "a", "comma-separated list of `tags` to search for.\n\tformat: name1[:attribute1][,name2[:attribute2]]")
+
+	var pQuery string
+	flag.StringVar(&pQuery, "query", "", "enter a raw query, such as 'ul>li'")
+
 	var help bool
 	flag.BoolVar(&help, "h", false, "print help")
 
 	flag.BoolVar(&document.Config.Reparent, "p", false, "reparent relative URIs to request domain")
+
 	flag.Parse()
 
 	if help {
@@ -32,8 +37,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	tags := tag.DescriptionSliceFromMultiSpec(pTag)
-
 	if len(flag.Args()) == 0 {
 		exitErr(errOneURL)
 	}
@@ -41,10 +44,17 @@ func main() {
 	targets, err := target.ParseLocations(flag.Args()...)
 	exitErr(err)
 
+	var tags tag.DescriptionSlice
+	if pQuery != "" {
+		tags = tag.RawQuery(pQuery)
+	} else {
+		tags = tag.DescriptionSliceFromMultiSpec(pTag)
+	}
+
 	output, err := document.NewProcessor(targets, tags).ReachTargets()
 	exitErr(err)
-
 	fmt.Print(strings.Join(output, "\n"))
+
 	fmt.Println()
 }
 

@@ -36,4 +36,11 @@ description
 robots
 ````
 
+Use a raw query:
+````
+> reach -query "div.all_external_links" http://elisarver.com/another-week-of-accomplishment
+
+// Document body
+````
+
 Contact: eli.sarver@gmail.com

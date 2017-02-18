@@ -12,3 +12,7 @@ func DescriptionSliceFromMultiSpec(multiTagSpec string) DescriptionSlice {
 	}
 	return ds
 }
+
+func RawQuery(query string) DescriptionSlice {
+	return DescriptionSlice{Description{CSSSelector: query}}
+}
