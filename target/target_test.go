@@ -22,20 +22,19 @@ func TestNewTarget(t *testing.T) {
 	for instance, test := range tests {
 		reporter := testhelp.Reporter(t, instance)
 		fn := func() (Location, error) {
-			return NewLocation(test.input.(string))
+			return Parse(test.input.(string))
 		}
 		reportOn(reporter, fn, test.expected)
 	}
 }
 
 func TestParse(t *testing.T) {
-	u := testhelp.NewURL(t, "http://foo.bar/")
 	tests := InputExpected{
 		"/baz": {input: "/baz", expected: "http://foo.bar/baz"},
 	}
 	for instance, test := range tests {
 		reporter := testhelp.Reporter(t, instance)
-		tgt := &Location{URL: u}
+		tgt := TestedNewLocation(t, "http://foo.bar/")
 		fn := func() (Location, error) {
 			return tgt.Parse(test.input.(string))
 		}
@@ -55,16 +54,25 @@ func reportOn(r *testhelp.R, fn func() (Location, error), expected interface{}) 
 }
 
 func TestParseAll(t *testing.T) {
-	_, err := ParseLocations([]string{}...)
+	_, err := ParseAll([]string{}...)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
-	result, err := ParseLocations("http://google.com/", "http://google.com/", "http://example.com/")
+	result, err := ParseAll("http://google.com/", "http://google.com/", "http://example.com/")
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
-	expected := LocationSlice{{testhelp.NewURL(t, "http://google.com/")},
-		{testhelp.NewURL(t, "http://example.com/")}}
+	expected := LocationSlice{TestedNewLocation(t, "http://google.com/"),
+		TestedNewLocation(t, "http://example.com/")}
 	r := testhelp.Reporter(t, "parseAll")
 	r.Compare(expected, result)
+}
+
+// TestedNewLocation creates a new url, and fails the test if it's invalid.
+func TestedNewLocation(t *testing.T, textURL string) Location {
+	l, err := Parse(textURL)
+	if err != nil {
+		t.Error(err)
+	}
+	return l
 }

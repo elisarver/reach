@@ -24,7 +24,7 @@ func TestReachTargets(t *testing.T) {
 	// use the internal generator to separate defaults from
 	// runtime version
 	Config.Retrieve = genRetrieve(reachFnSuccess)
-	l, _ := target.NewLocation("http://foo.bar/")
+	l, _ := target.Parse("http://foo.bar/")
 	ls := target.LocationSlice{l}
 	ds := tag.DescriptionSlice{tag.DescriptionFromSpec("a"), tag.DescriptionFromSpec("img")}
 	processor := NewProcessor(ls, ds)
@@ -46,7 +46,7 @@ func TestRawQuery(t *testing.T) {
 	// use the internal generator to separate defaults from
 	// runtime version
 	Config.Retrieve = genRetrieve(reachFnSuccess)
-	l, _ := target.NewLocation("http://foo.bar/")
+	l, _ := target.Parse("http://foo.bar/")
 	ls := target.LocationSlice{l}
 	ds := tag.RawQuery("body")
 	processor := NewProcessor(ls, ds)

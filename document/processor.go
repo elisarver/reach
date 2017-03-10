@@ -52,7 +52,7 @@ func (p *Processor) ReachTargets() ([]string, error) {
 			return
 		}
 		if r, e := fn(*s); e == nil {
-			*s = r.URL.String()
+			*s = r.String()
 		} else {
 			return
 		}

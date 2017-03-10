@@ -41,7 +41,7 @@ func main() {
 		exitErr(errOneURL)
 	}
 
-	targets, err := target.ParseLocations(flag.Args()...)
+	targets, err := target.ParseAll(flag.Args()...)
 	exitErr(err)
 
 	var tags tag.DescriptionSlice

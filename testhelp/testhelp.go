@@ -3,7 +3,6 @@ package testhelp
 
 import (
 	"fmt"
-	"net/url"
 	"reflect"
 	"testing"
 )
@@ -17,15 +16,6 @@ type R struct {
 // Reporter returns an R that reports on a test instance in its logging.
 func Reporter(t *testing.T, instance string) *R {
 	return &R{t: t, instance: instance}
-}
-
-// NewURL creates a new url, and fails the test if it's invalid.
-func NewURL(t *testing.T, textURL string) *url.URL {
-	u, err := url.Parse(textURL)
-	if err != nil {
-		t.Error(err)
-	}
-	return u
 }
 
 // Errorf reports an error on a test to the enclosing R

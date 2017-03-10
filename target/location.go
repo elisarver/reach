@@ -2,38 +2,37 @@ package target
 
 import (
 	"net/url"
-
+	"fmt"
 )
 
 // Location represents a validated url.
 // +gen set slice:"DistinctBy"
-type Location struct {
-	*url.URL
+type Location interface {
+	Parse(string) (Location, error)
+	ParseAll(args ...string) (LocationSlice, error)
+	fmt.Stringer
 }
 
-var emptyLocation = Location{&url.URL{}}
-
-// NewLocation makes a Location from a raw url string.
-func NewLocation(textURL string) (Location, error) {
-	return emptyLocation.Parse(textURL)
+type location struct {
+	u *url.URL
 }
+
+var emptyLocation = location{&url.URL{}}
+
+// Parse makes a Location from a raw url string.
+var Parse = emptyLocation.Parse
+
+// ParseAll processes a list of strings
+var ParseAll = emptyLocation.ParseAll
 
 // Parse makes a Location from a reference Location.
-func (l Location) Parse(textURL string) (Location, error) {
-	u, err := l.URL.Parse(textURL)
-	if err != nil {
-		return Location{}, err
-	}
-	return Location{u}, nil
+func (l location) Parse(textURL string) (Location, error) {
+	u, err := l.u.Parse(textURL)
+	return &location{u}, err
 }
 
-// ParseLocations without creating a Location
-func ParseLocations(args ...string) (LocationSlice, error) {
-	return emptyLocation.ParseLocations(args...)
-}
-
-// ParseLocations converts arguments into a LocationSlice of distinct values
-func (l Location) ParseLocations(args ...string) (LocationSlice, error) {
+// ParseAll converts arguments into a LocationSlice of distinct values
+func (l location) ParseAll(args ...string) (LocationSlice, error) {
 	ls := make(LocationSlice, 0, len(args))
 	for i := range args {
 		if loc, err := l.Parse(args[i]); err == nil {
@@ -43,4 +42,8 @@ func (l Location) ParseLocations(args ...string) (LocationSlice, error) {
 		}
 	}
 	return ls.DistinctByURL(), nil
+}
+
+func (l location) String() string {
+	return l.u.String()
 }
