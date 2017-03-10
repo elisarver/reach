@@ -30,8 +30,8 @@ func (p *Processor) selectMap(doc *goquery.Document, desc tag.Description) []str
 func (p *Processor) mapGen(desc tag.Description) func(int, *goquery.Selection) string {
 	return func(_ int, sel *goquery.Selection) string {
 		var s string
-		if desc.Attribute != "" {
-			s, _ = sel.Attr(desc.Attribute)
+		if desc.Attribute() != "" {
+			s, _ = sel.Attr(desc.Attribute())
 		} else {
 			s, _ = sel.Html()
 		}
@@ -76,7 +76,7 @@ func (p *Processor) ReachTargets() ([]string, error) {
 		}
 		for _, t := range p.Tags {
 			var values = p.selectMap(d, t)
-			if Config.Reparent && URLAttrs.contains(t.Attribute) {
+			if Config.Reparent && URLAttrs.contains(t.Attribute()) {
 				reparentList(&values, l.Parse)
 			}
 

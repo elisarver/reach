@@ -26,7 +26,7 @@ func TestReachTargets(t *testing.T) {
 	Config.Retrieve = genRetrieve(reachFnSuccess)
 	l, _ := target.Parse("http://foo.bar/")
 	ls := target.LocationSlice{l}
-	ds := tag.DescriptionSlice{tag.DescriptionFromSpec("a"), tag.DescriptionFromSpec("img")}
+	ds := tag.DescriptionSlice{tag.FromSpec("a"), tag.FromSpec("img")}
 	processor := NewProcessor(ls, ds)
 	actual, err := processor.ReachTargets()
 	if err != nil {

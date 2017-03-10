@@ -48,7 +48,7 @@ func main() {
 	if pQuery != "" {
 		tags = tag.RawQuery(pQuery)
 	} else {
-		tags = tag.DescriptionSliceFromMultiSpec(pTag)
+		tags = tag.FromMultiSpec(pTag)
 	}
 
 	output, err := document.NewProcessor(targets, tags).ReachTargets()

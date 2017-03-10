@@ -5,21 +5,29 @@ import (
 	"strings"
 )
 
-// Description represents an html tag's attributes. Satisfies SelectorMapper
+// description represents an html tag's attributes. Satisfies SelectorMapper
 // +gen slice
-type Description struct {
-	Name,
-	Attribute,
-	CSSSelector string
+type Description interface {
+	Attribute() string
+	Select() string
+}
+
+type description struct {
+	attribute   string
+	cssSelector string
 }
 
 // Select returns a tag's CSS select string.
-func (d Description) Select() string {
-	return d.CSSSelector
+func (d description) Select() string {
+	return d.cssSelector
 }
 
-// DescriptionFromSpec creates a new tag with the appropriate attributes built-in.
-func DescriptionFromSpec(tagSpec string) Description {
+func (d description) Attribute() string {
+	return d.attribute
+}
+
+// FromSpec creates a new tag with the appropriate attributes built-in.
+func FromSpec(tagSpec string) Description {
 	n, a := nameAttribute(tagSpec)
 	if a == "" && n != "" {
 		a = defaultAttribute(n)
@@ -27,38 +35,41 @@ func DescriptionFromSpec(tagSpec string) Description {
 	return NewDescription(n, a)
 }
 
-// NewDescription creates a tag.Description with css selector
+// NewDescription creates a tag.description with css selector
 func NewDescription(name, attr string) Description {
-	var s string
+	var selector string
 	if name != "" && attr != "" {
-		s = fmt.Sprintf("%s[%s]", name, attr)
+		selector = fmt.Sprintf("%s[%s]", name, attr)
 	}
-	return Description{
-		Name:        name,
-		Attribute:   attr,
-		CSSSelector: s,
+	return description{
+		cssSelector: selector,
+		attribute: attr,
 	}
 }
 
 // nameAttribute splits a tagSpec into its name and attribute
 func nameAttribute(tagSpec string) (name, attribute string) {
-	s := strings.Split(tagSpec, ":")
-	if len(s) > 0 && s[0] != "" {
-		name = s[0]
-	}
-	if len(s) > 1 && s[1] != "" {
-		attribute = s[1]
+L:
+	for i, v := range strings.Split(tagSpec, ":") {
+		switch i {
+		case 0:
+			name = v
+		case 1:
+			attribute = v
+		default:
+			// we don't parse beyond two values
+			break L
+		}
 	}
 	return name, attribute
 }
 
-// defaultAttribute provides the default link attribute for a given tag name
-func defaultAttribute(name string) (attribute string) {
-	switch name {
-	default:
-		attribute = "src"
+// defaultAttribute provides the default reference attribute for a given tag name
+func defaultAttribute(tag string) (attribute string) {
+	switch tag {
 	case "a", "link":
-		attribute = "href"
+		return "href"
+	default:
+		return "src"
 	}
-	return attribute
 }
