@@ -9,25 +9,29 @@ import (
 )
 
 // Processor is a colletion of structs that are processed for values.
-type Processor struct {
-	Tags      tag.DescriptionSlice
-	Locations target.LocationSlice
+type Processor interface {
+	ReachTargets() ([]string, error)
+}
+
+type processor struct {
+	tags      tag.DescriptionSlice
+	locations target.LocationSlice
 }
 
 // NewProcessor creates a new Processor with the target locations and tag descriptions
-func NewProcessor(loc target.LocationSlice, tags tag.DescriptionSlice) *Processor {
-	return &Processor{
-		Tags:      tags,
-		Locations: loc}
+func NewProcessor(loc target.LocationSlice, tags tag.DescriptionSlice) Processor {
+	return processor{
+		tags:      tags,
+		locations: loc}
 }
 
 // selectMap selects elements and maps them to response. Drops empty values.
-func (p *Processor) selectMap(doc *goquery.Document, desc tag.Description) []string {
+func (p processor) selectMap(doc *goquery.Document, desc tag.Description) []string {
 	return DropEmpties(doc.Find(desc.Select()).Map(p.mapGen(desc)))
 }
 
 //mapGen generates the mapping function necessary to process goquery selections
-func (p *Processor) mapGen(desc tag.Description) func(int, *goquery.Selection) string {
+func (p processor) mapGen(desc tag.Description) func(int, *goquery.Selection) string {
 	return func(_ int, sel *goquery.Selection) string {
 		var s string
 		if desc.Attribute() != "" {
@@ -46,7 +50,7 @@ var URLAttrs = set{"href": nil, "link": nil, "src": nil}
 // in an attempt to extract values out of them. If the global Reparent config option
 // is set, It also applies the URL re-parenting of relative paths to the values,
 // generating more canonical site-oriented urls.
-func (p *Processor) ReachTargets() ([]string, error) {
+func (p processor) ReachTargets() ([]string, error) {
 	reparentItem := func(s *string, fn func(string) (target.Location, error)) {
 		if strings.HasPrefix(*s, "javascript") {
 			return
@@ -69,12 +73,12 @@ func (p *Processor) ReachTargets() ([]string, error) {
 	}
 
 	var output []string
-	for _, l := range p.Locations {
+	for _, l := range p.locations {
 		d, err := Config.Retrieve(l.String())
 		if err != nil {
 			return []string{}, err
 		}
-		for _, t := range p.Tags {
+		for _, t := range p.tags {
 			var values = p.selectMap(d, t)
 			if Config.Reparent && URLAttrs.contains(t.Attribute()) {
 				reparentList(&values, l.Parse)
