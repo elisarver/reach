@@ -8,26 +8,30 @@ import (
 	"github.com/elisarver/reach/target"
 )
 
-// Processor is a colletion of structs that are processed for values.
+// Processor is a an interface for processing a list of descriptions over a list of locations
 type Processor interface {
-	ReachTargets() ([]string, error)
+	Process(tag.DescriptionSlice, target.LocationSlice) ([]string, error)
 }
 
 type processor struct {
-	tags      tag.DescriptionSlice
-	locations target.LocationSlice
+	retrieve retriever
+	reparent bool
 }
 
-// NewProcessor creates a new Processor with the target locations and tag descriptions
-func NewProcessor(loc target.LocationSlice, tags tag.DescriptionSlice) Processor {
-	return processor{
-		tags:      tags,
-		locations: loc}
+// NewProcessor wires a retriever function and sets the reparent flag.
+func NewProcessor(retriever retriever, reparent bool) Processor {
+	if retriever == nil {
+		retriever = genRetrieve(nil)
+	}
+	return processor {
+		retrieve: retriever,
+		reparent: reparent,
+	}
 }
 
 // selectMap selects elements and maps them to response. Drops empty values.
 func (p processor) selectMap(doc *goquery.Document, desc tag.Description) []string {
-	return DropEmpties(doc.Find(desc.Select()).Map(p.mapGen(desc)))
+	return dropEmpties(doc.Find(desc.Select()).Map(p.mapGen(desc)))
 }
 
 //mapGen generates the mapping function necessary to process goquery selections
@@ -50,7 +54,8 @@ var URLAttrs = set{"href": nil, "link": nil, "src": nil}
 // in an attempt to extract values out of them. If the global Reparent config option
 // is set, It also applies the URL re-parenting of relative paths to the values,
 // generating more canonical site-oriented urls.
-func (p processor) ReachTargets() ([]string, error) {
+// it takes a slice of tag descriptions and a slice of target locations
+func (p processor) Process(tags tag.DescriptionSlice, locations target.LocationSlice) ([]string, error) {
 	reparentItem := func(s *string, fn func(string) (target.Location, error)) {
 		if strings.HasPrefix(*s, "javascript") {
 			return
@@ -73,14 +78,14 @@ func (p processor) ReachTargets() ([]string, error) {
 	}
 
 	var output []string
-	for _, l := range p.locations {
-		d, err := Config.Retrieve(l.String())
+	for _, l := range locations {
+		d, err := p.retrieve(l.String())
 		if err != nil {
 			return []string{}, err
 		}
-		for _, t := range p.tags {
+		for _, t := range tags {
 			var values = p.selectMap(d, t)
-			if Config.Reparent && URLAttrs.contains(t.Attribute()) {
+			if p.reparent && URLAttrs.contains(t.Attribute()) {
 				reparentList(&values, l.Parse)
 			}
 
@@ -90,8 +95,8 @@ func (p processor) ReachTargets() ([]string, error) {
 	return output, nil
 }
 
-// DropEmpties eliminates empty values from a list of strings.
-func DropEmpties(list []string) []string {
+// dropEmpties eliminates empty values from a list of strings.
+func dropEmpties(list []string) []string {
 	newList := make([]string, 0, len(list))
 	for i := range list {
 		if list[i] != "" {

@@ -12,8 +12,6 @@ import (
 	"github.com/elisarver/reach/target"
 )
 
-var errOneURL = errors.New("please supply at least one URL")
-
 func main() {
 	var pTag string
 	flag.StringVar(&pTag, "tag", "a", "comma-separated list of `tags` to search for.\n\tformat: name1[:attribute1][,name2[:attribute2]]")
@@ -24,7 +22,8 @@ func main() {
 	var help bool
 	flag.BoolVar(&help, "h", false, "print help")
 
-	flag.BoolVar(&document.Config.Reparent, "p", false, "reparent relative URIs to request domain")
+	var reparent bool
+	flag.BoolVar(&reparent, "p", false, "reparent relative URIs to request domain")
 
 	flag.Parse()
 
@@ -38,7 +37,7 @@ func main() {
 	}
 
 	if len(flag.Args()) == 0 {
-		exitErr(errOneURL)
+		exitErr(errors.New("please supply at least one URL"))
 	}
 
 	targets, err := target.ParseAll(flag.Args()...)
@@ -50,8 +49,8 @@ func main() {
 	} else {
 		tags = tag.FromMultiSpec(pTag)
 	}
-
-	output, err := document.NewProcessor(targets, tags).ReachTargets()
+	processor := document.NewProcessor(nil, reparent)
+	output, err := processor.Process(tags, targets)
 	exitErr(err)
 	fmt.Print(strings.Join(output, "\n"))
 
