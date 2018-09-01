@@ -1,4 +1,4 @@
 *.sublime*
 .idea/
 vendor/
-cmd/reach/reach
+reach
