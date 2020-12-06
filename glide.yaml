@@ -1,4 +1,0 @@
-package: github.com/elisarver/reach
-import:
-- package: github.com/PuerkitoBio/goquery
-- package: github.com/clipperhouse/gen
