@@ -2,7 +2,7 @@ package tag
 
 import "strings"
 
-// FromMultiSpec takes multiple comma-separated tag specs and turns them into a slice of tags
+// FromMultiSpec takes multiple comma-separated tag specs and turns them into a slice of tags.
 func FromMultiSpec(multiTagSpec string) DescriptionSlice {
 	ss := strings.Split(multiTagSpec, ",")
 	ds := make(DescriptionSlice, 0, len(ss))
@@ -10,6 +10,7 @@ func FromMultiSpec(multiTagSpec string) DescriptionSlice {
 		d := FromSpec(s)
 		ds = append(ds, d)
 	}
+
 	return ds
 }
 

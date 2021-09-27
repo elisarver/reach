@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// retriever is a function that implements the same interface as goquery
+// retriever is a function that implements the same interface as goquery.
 type retriever func(location string) (*goquery.Document, error)
 
 // documentFn exists to make testing possible without resorting to hardcoded function.
@@ -17,15 +17,16 @@ func genRetrieve(fn documentFn) retriever {
 	if fn == nil {
 		fn = document
 	}
+
 	return func(location string) (*goquery.Document, error) {
 		return fn(location)
 	}
 }
 
 func document(url string) (*goquery.Document, error) {
-	res, e := http.Get(url)
-	if e != nil {
-		return nil, e
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
 	}
 	defer res.Body.Close()
 

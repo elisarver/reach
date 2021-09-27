@@ -54,8 +54,7 @@ func reportOn(r *testhelp.R, fn func() (Location, error), expected interface{}) 
 }
 
 func TestParseAll(t *testing.T) {
-	_, err := ParseAll([]string{}...)
-	if err != nil {
+	if _, err := ParseAll([]string{}...); err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
 	result, err := ParseAll("http://google.com/", "http://google.com/", "http://example.com/")
@@ -74,5 +73,6 @@ func TestedNewLocation(t *testing.T, textURL string) Location {
 	if err != nil {
 		t.Error(err)
 	}
+
 	return l
 }
