@@ -75,7 +75,6 @@ func (p processor) Process(tags tag.DescriptionSlice, locations target.LocationS
 			}
 			reparentItem(&(*values)[i], fn)
 		}
-		return
 	}
 
 	var output []string
