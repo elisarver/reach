@@ -17,7 +17,7 @@ func TestNewTarget(t *testing.T) {
 		"root relative": {input: "/", expected: "/"},
 		"domain":        {input: "http://foo.bar/", expected: "http://foo.bar/"},
 		"full path":     {input: "http://foo.bar/a/b", expected: "http://foo.bar/a/b"},
-		"parse error":   {input: "http://foo bar/a/b", expected: "parse http://foo bar/a/b: invalid character \" \" in host name"},
+		"parse error":   {input: "http://foo bar/a/b", expected: `parse "http://foo bar/a/b": invalid character " " in host name`},
 	}
 	for instance, test := range tests {
 		reporter := testhelp.Reporter(t, instance)
@@ -54,8 +54,7 @@ func reportOn(r *testhelp.R, fn func() (Location, error), expected interface{}) 
 }
 
 func TestParseAll(t *testing.T) {
-	_, err := ParseAll([]string{}...)
-	if err != nil {
+	if _, err := ParseAll([]string{}...); err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
 	result, err := ParseAll("http://google.com/", "http://google.com/", "http://example.com/")
@@ -74,5 +73,6 @@ func TestedNewLocation(t *testing.T, textURL string) Location {
 	if err != nil {
 		t.Error(err)
 	}
+
 	return l
 }

@@ -6,7 +6,9 @@ import (
 	"testing"
 
 	"fmt"
+
 	"github.com/PuerkitoBio/goquery"
+
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
 	"github.com/elisarver/reach/testhelp"
@@ -16,6 +18,7 @@ func TestReachTargets(t *testing.T) {
 	reachFnSuccess := func(_ string) (*goquery.Document, error) {
 		r := strings.NewReader("<html><body><a href='http://foo.bar/'>site</a><img src='/logo.png'/></body></html>" +
 			"<img src='javascript:'/>")
+
 		return goquery.NewDocumentFromReader(r)
 	}
 	processor := NewProcessor(genRetrieve(reachFnSuccess), true)
@@ -35,6 +38,7 @@ func TestReachTargets(t *testing.T) {
 func TestRawQuery(t *testing.T) {
 	reachFnSuccess := func(_ string) (*goquery.Document, error) {
 		r := strings.NewReader("<html><body><p>body1</p><p>body2</p></body></html>")
+
 		return goquery.NewDocumentFromReader(r)
 	}
 

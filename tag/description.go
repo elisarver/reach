@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-// description represents an html tag's attributes. Satisfies SelectorMapper
-// +gen slice
+// Description represents a html tag's attributes. Satisfies SelectorMapper.
+// +gen slice..
 type Description interface {
 	Attribute() string
 	Select() string
@@ -32,22 +32,24 @@ func FromSpec(tagSpec string) Description {
 	if a == "" && n != "" {
 		a = defaultAttribute(n)
 	}
+
 	return NewDescription(n, a)
 }
 
-// NewDescription creates a tag.description with css selector
+// NewDescription creates a tag.description with css selector..
 func NewDescription(name, attr string) Description {
 	var selector string
 	if name != "" && attr != "" {
 		selector = fmt.Sprintf("%s[%s]", name, attr)
 	}
+
 	return description{
 		cssSelector: selector,
-		attribute: attr,
+		attribute:   attr,
 	}
 }
 
-// nameAttribute splits a tagSpec into its name and attribute
+// nameAttribute splits a tagSpec into its name and attribute.
 func nameAttribute(tagSpec string) (name, attribute string) {
 L:
 	for i, v := range strings.Split(tagSpec, ":") {
@@ -61,10 +63,11 @@ L:
 			break L
 		}
 	}
+
 	return name, attribute
 }
 
-// defaultAttribute provides the default reference attribute for a given tag name
+// defaultAttribute provides the default reference attribute for a given tag name.
 func defaultAttribute(tag string) (attribute string) {
 	switch tag {
 	case "a", "link":

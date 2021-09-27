@@ -4,11 +4,12 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
 )
 
-// Processor is a an interface for processing a list of descriptions over a list of locations
+// Processor is a an interface for processing a list of descriptions over a list of locations.
 type Processor interface {
 	Process(tag.DescriptionSlice, target.LocationSlice) ([]string, error)
 }
@@ -23,7 +24,8 @@ func NewProcessor(retriever retriever, reparent bool) Processor {
 	if retriever == nil {
 		retriever = genRetrieve(nil)
 	}
-	return processor {
+
+	return processor{
 		retrieve: retriever,
 		reparent: reparent,
 	}
@@ -34,7 +36,7 @@ func (p processor) selectMap(doc *goquery.Document, desc tag.Description) []stri
 	return dropEmpties(doc.Find(desc.Select()).Map(p.mapGen(desc)))
 }
 
-//mapGen generates the mapping function necessary to process goquery selections
+// mapGen generates the mapping function necessary to process goquery selections.
 func (p processor) mapGen(desc tag.Description) func(int, *goquery.Selection) string {
 	return func(_ int, sel *goquery.Selection) string {
 		var s string
@@ -43,6 +45,7 @@ func (p processor) mapGen(desc tag.Description) func(int, *goquery.Selection) st
 		} else {
 			s, _ = sel.Html()
 		}
+
 		return s
 	}
 }
@@ -50,11 +53,11 @@ func (p processor) mapGen(desc tag.Description) func(int, *goquery.Selection) st
 // URLAttrs represents all attributes that have a URL-like as a value.
 var URLAttrs = set{"href": nil, "link": nil, "src": nil}
 
-// ReachTargets ranges over locations, and applies the descriptions to each document,
+// Process ranges over locations, and applies the descriptions to each document,
 // in an attempt to extract values out of them. If the global Reparent config option
 // is set, It also applies the URL re-parenting of relative paths to the values,
 // generating more canonical site-oriented urls.
-// it takes a slice of tag descriptions and a slice of target locations
+// it takes a slice of tag descriptions and a slice of target locations.
 func (p processor) Process(tags tag.DescriptionSlice, locations target.LocationSlice) ([]string, error) {
 	reparentItem := func(s *string, fn func(string) (target.Location, error)) {
 		if strings.HasPrefix(*s, "javascript") {
@@ -74,7 +77,6 @@ func (p processor) Process(tags tag.DescriptionSlice, locations target.LocationS
 			}
 			reparentItem(&(*values)[i], fn)
 		}
-		return
 	}
 
 	var output []string
@@ -92,6 +94,7 @@ func (p processor) Process(tags tag.DescriptionSlice, locations target.LocationS
 			output = append(output, values...)
 		}
 	}
+
 	return output, nil
 }
 
@@ -103,6 +106,7 @@ func dropEmpties(list []string) []string {
 			newList = append(newList, list[i])
 		}
 	}
+
 	return newList
 }
 
@@ -112,5 +116,6 @@ type set map[string]interface{}
 // contains checks whether a set contains a member.
 func (a set) contains(attr string) bool {
 	_, ok := a[attr]
+
 	return ok
 }

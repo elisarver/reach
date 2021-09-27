@@ -1,12 +1,12 @@
 package target
 
 import (
-	"net/url"
 	"fmt"
+	"net/url"
 )
 
 // Location represents a validated url.
-// +gen set slice:"DistinctBy"
+// +gen set slice:"DistinctBy".
 type Location interface {
 	Parse(string) (Location, error)
 	ParseAll(args ...string) (LocationSlice, error)
@@ -22,16 +22,17 @@ var emptyLocation = location{&url.URL{}}
 // Parse makes a Location from a raw url string.
 var Parse = emptyLocation.Parse
 
-// ParseAll processes a list of strings
+// ParseAll processes a list of strings.
 var ParseAll = emptyLocation.ParseAll
 
 // Parse makes a Location from a reference Location.
 func (l location) Parse(textURL string) (Location, error) {
 	u, err := l.u.Parse(textURL)
+
 	return &location{u}, err
 }
 
-// ParseAll converts arguments into a LocationSlice of distinct values
+// ParseAll converts arguments into a LocationSlice of distinct values.
 func (l location) ParseAll(args ...string) (LocationSlice, error) {
 	ls := make(LocationSlice, 0, len(args))
 	for i := range args {
@@ -41,6 +42,7 @@ func (l location) ParseAll(args ...string) (LocationSlice, error) {
 			return LocationSlice{}, err
 		}
 	}
+
 	return ls.DistinctByURL(), nil
 }
 

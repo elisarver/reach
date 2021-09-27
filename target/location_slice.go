@@ -18,5 +18,6 @@ Outer:
 		}
 		result = append(result, v)
 	}
+
 	return result
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/elisarver/reach/testhelp"
 )
 
-// tags represent finders
 func TestFromMultiSpec(t *testing.T) {
 	tests := map[string]struct {
 		name     string
