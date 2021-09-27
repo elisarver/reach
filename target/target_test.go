@@ -17,7 +17,7 @@ func TestNewTarget(t *testing.T) {
 		"root relative": {input: "/", expected: "/"},
 		"domain":        {input: "http://foo.bar/", expected: "http://foo.bar/"},
 		"full path":     {input: "http://foo.bar/a/b", expected: "http://foo.bar/a/b"},
-		"parse error":   {input: "http://foo bar/a/b", expected: "parse http://foo bar/a/b: invalid character \" \" in host name"},
+		"parse error":   {input: "http://foo bar/a/b", expected: `parse "http://foo bar/a/b": invalid character " " in host name`},
 	}
 	for instance, test := range tests {
 		reporter := testhelp.Reporter(t, instance)
