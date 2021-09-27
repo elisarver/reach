@@ -6,7 +6,9 @@ import (
 	"testing"
 
 	"fmt"
+
 	"github.com/PuerkitoBio/goquery"
+
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
 	"github.com/elisarver/reach/testhelp"

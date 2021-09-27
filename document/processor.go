@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+
 	"github.com/elisarver/reach/tag"
 	"github.com/elisarver/reach/target"
 )
@@ -23,7 +24,7 @@ func NewProcessor(retriever retriever, reparent bool) Processor {
 	if retriever == nil {
 		retriever = genRetrieve(nil)
 	}
-	return processor {
+	return processor{
 		retrieve: retriever,
 		reparent: reparent,
 	}
@@ -34,7 +35,7 @@ func (p processor) selectMap(doc *goquery.Document, desc tag.Description) []stri
 	return dropEmpties(doc.Find(desc.Select()).Map(p.mapGen(desc)))
 }
 
-//mapGen generates the mapping function necessary to process goquery selections
+// mapGen generates the mapping function necessary to process goquery selections
 func (p processor) mapGen(desc tag.Description) func(int, *goquery.Selection) string {
 	return func(_ int, sel *goquery.Selection) string {
 		var s string

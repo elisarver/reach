@@ -43,7 +43,7 @@ func NewDescription(name, attr string) Description {
 	}
 	return description{
 		cssSelector: selector,
-		attribute: attr,
+		attribute:   attr,
 	}
 }
 

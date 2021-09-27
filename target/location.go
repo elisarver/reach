@@ -1,8 +1,8 @@
 package target
 
 import (
-	"net/url"
 	"fmt"
+	"net/url"
 )
 
 // Location represents a validated url.
